@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.x.mapper.NotificationMapper">
+    <insert id="sendRequest">
+         insert into notification(user_id,sender_id,status,type,content,group_id) values(#{userId},#{senderId},#{status},#{type},#{content},#{groupId})
+    </insert>
+    <select id="getSendNotificationList" resultType="com.x.pojo.vo.NotifictionVO">
+        SELECT
+                (SELECT avatar FROM user WHERE id = n.sender_id) AS avatar,
+                u.username AS username,
+                n.type AS type,
+                n.status AS status,
+                n.created_at AS created_at,
+                n.user_id AS user_id,
+                n.sender_id AS sender_id,
+                n.content AS content,
+                n.group_id AS groupId
+        FROM notification n
+                 JOIN user u ON n.user_id = u.id
+        WHERE n.sender_id = #{id}
+        ORDER BY n.created_at DESC
+    </select>
+
+    <select id="getReceiveNotificationList" resultType="com.x.pojo.vo.NotifictionVO">
+        SELECT
+            u.avatar AS avatar,
+            u.username AS username,
+            n.type AS type,
+            n.status AS status,
+            n.created_at AS created_at,
+            n.user_id AS user_id,
+            n.sender_id AS sender_id,
+            n.content AS content,
+            n.group_id AS groupId
+        FROM notification n
+                 JOIN user u ON n.sender_id = u.id
+        WHERE n.user_id = #{id}
+        ORDER BY n.created_at DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.x.mapper.ArticleMapper">
+
+    <!-- 插入文章 -->
+    <insert id="insert" parameterType="com.x.pojo.entity.Article" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO article (
+            title, content, summary, cover, category_id,
+            view_count, like_count, comment_count,
+            publish_time, update_time,user_id
+        ) VALUES (
+                     #{title}, #{content}, #{summary}, #{cover}, #{categoryId},
+                     #{viewCount}, #{likeCount}, #{commentCount},
+                     #{publishTime}, #{updateTime}, #{userId}
+                 )
+    </insert>
+    <!-- 分页查询文章列表 -->
+    <select id="selectArticleList" resultType="com.x.pojo.entity.Article">
+        SELECT
+        id, title, content, summary, cover, category_id as categoryId,
+        view_count as viewCount, like_count as likeCount, comment_count as commentCount,
+        publish_time as publishTime, update_time as updateTime,user_id as userId
+        FROM article
+        <where>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+        </where>
+        ORDER BY publish_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 查询文章总数 -->
+    <select id="selectArticleCount" resultType="int">
+        SELECT COUNT(*)
+        FROM article
+        <where>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据ID查询文章详情 -->
+    <select id="selectById" resultType="com.x.pojo.entity.Article">
+        SELECT
+            id, title, content, summary, cover, category_id as categoryId,
+            view_count as viewCount, like_count as likeCount, comment_count as commentCount,
+            publish_time as publishTime, update_time as updateTime,user_id as userId
+        FROM article
+        WHERE id = #{id}
+    </select>
+
+
+    <!-- 获取热门文章 -->
+    <select id="selectTopArticles" resultType="com.x.pojo.entity.Article">
+        SELECT
+            id, title, content, summary, cover, category_id as categoryId,
+            view_count as viewCount, like_count as likeCount, comment_count as commentCount,
+            publish_time as publishTime, update_time as updateTime,user_id as userId
+        FROM article
+        ORDER BY view_count DESC, like_count DESC, publish_time DESC
+            LIMIT #{limit}
+    </select>
+    <select id="getIds" resultType="java.lang.Long">
+        SELECT id FROM article
+        <where>
+            <if test="categoryId != null">
+                 category_id = #{categoryId}
+            </if>
+        </where>
+        ORDER BY publish_time DESC
+    </select>
+
+    <!-- 增加文章点赞数 -->
+    <update id="incrementLikeCount">
+        UPDATE article
+        SET like_count = like_count + 1
+        WHERE id = #{articleId}
+    </update>
+
+    <!-- 增加文章浏览量 -->
+    <update id="incrementViewCount">
+        UPDATE article
+        SET view_count = view_count + 1
+        WHERE id = #{articleId}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM article WHERE id = #{id}
+    </delete>
+
+
+
+    <!-- 更新文章 -->
+    <update id="updateArticle" parameterType="com.x.pojo.entity.Article">
+        UPDATE article
+        SET
+            title = #{title},
+            content = #{content},
+            summary = #{summary},
+            cover = #{cover},
+            category_id = #{categoryId},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+</mapper>

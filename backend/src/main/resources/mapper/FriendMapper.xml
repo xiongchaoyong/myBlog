@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.x.mapper.FriendMapper">
+    <select id="getFriendList" resultType="com.x.pojo.vo.FriendVO">
+        SELECT
+            u.id AS friend_id,
+            u.username,
+            u.avatar,
+            u.gender,
+            u.signature,
+            u.region,
+            u.cover,
+               u.account,
+            f.created_at
+        FROM
+            friend f
+                JOIN
+            user u
+            ON
+                f.friend_id = u.id
+        WHERE
+            f.user_id = #{id}
+    </select>
+</mapper>

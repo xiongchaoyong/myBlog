@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: blog
+  datasource:
+    url: jdbc:mysql://mysql/myBlog
+    username: root
+    password: 123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 20MB       # 单个文件最大 20MB
+      max-request-size: 50MB    # 请求总大小最大 50MB
+  config:
+    import: optional:classpath:application-secret.yml
+  
+server:
+    port: 8081
+    servlet:
+      encoding:
+          charset: UTF-8
+          force: true
+          enabled: true
+
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.x.entity
+  type-handlers-package: com.x.utils
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      x:
+        mapper: debug
+        service: info
+        controller: info

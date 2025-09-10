@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.x.mapper.TagMapper">
+    <update id="updateUserTags">
+        insert into user_interest(user_id,tag_id) values
+        <foreach item="tagId" collection="selectedTagIds" separator=",">
+            (#{userId},#{tagId})
+        </foreach>
+    </update>
+
+    <select id="getTagById" resultType="com.x.pojo.entity.Tag">
+        SELECT
+            t.id ,
+            t.tag_name,
+            t.color
+        FROM
+            user_interest ui
+                JOIN
+            interest_tag t ON ui.tag_id = t.id  and t.status = 1
+        WHERE
+            ui.user_id = #{userId};
+    </select>
+    <select id="getUserIds" resultType="java.lang.Long">
+        SELECT DISTINCT u.id
+        FROM user u
+        JOIN user_interest ui ON u.id = ui.user_id
+        WHERE ui.tag_id IN (
+        SELECT tag_id
+        FROM user_interest
+        WHERE user_id = 1
+        )
+    </select>
+</mapper>

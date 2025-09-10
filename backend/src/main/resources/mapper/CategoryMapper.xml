@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.x.mapper.CategoryMapper">
+
+    <!-- 查询所有分类 -->
+    <select id="selectAll" resultType="com.x.pojo.entity.Category">
+        SELECT
+            id,
+            name,
+            color,
+            create_time,
+            update_time
+        FROM category
+        ORDER BY id ASC
+    </select>
+
+    <!-- 根据名称查询分类 -->
+    <select id="selectByName" resultType="com.x.pojo.entity.Category">
+        SELECT
+            id,
+            name,
+            color,
+            create_time,
+            update_time
+        FROM category
+        WHERE name = #{name}
+    </select>
+
+    <!-- 插入分类 -->
+    <insert id="insert" parameterType="com.x.pojo.entity.Category" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO category (
+            name,
+            color,
+            create_time,
+            update_time
+        ) VALUES (
+                     #{name},
+                     #{color},
+                     #{createTime},
+                     #{updateTime}
+                 )
+    </insert>
+    <select id="selectAllWithArticleCount" resultType="com.x.pojo.entity.Category">
+        SELECT
+            c.id,
+            c.name,
+            c.color,
+            c.create_time,
+            c.update_time,
+            COALESCE(COUNT(a.id), 0) as articleCount
+        FROM category c
+                 LEFT JOIN article a ON c.id = a.category_id
+        GROUP BY c.id, c.name, c.color, c.create_time, c.update_time
+        ORDER BY c.id
+    </select>
+</mapper>

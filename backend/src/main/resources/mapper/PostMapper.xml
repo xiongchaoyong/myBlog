@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.x.mapper.PostMapper">
+<!--    <select id="getFriendPosts" resultType="com.x.pojo.dto.PostDTO">-->
+<!--        SELECT-->
+<!--        p.id,-->
+<!--        p.user_id,-->
+<!--        p.content,-->
+<!--        p.image_urls,-->
+<!--        p.created_at AS created_at,-->
+<!--        u.id AS 'author.id',-->
+<!--        u.username AS 'author.username',-->
+<!--        u.avatar AS 'author.avatar'-->
+<!--        FROM post p-->
+<!--        JOIN user u ON p.user_id = u.id-->
+<!--        WHERE p.user_id IN-->
+<!--        <foreach collection="friendIds" item="id" open="(" separator="," close=")">-->
+<!--            #{id}-->
+<!--        </foreach>-->
+<!--        AND p.status = 1-->
+<!--        ORDER BY p.created_at DESC-->
+<!--    </select>-->
+
+    <select id="getCommentsByPostIds" resultType="com.x.pojo.dto.PostCommentDTO">
+        SELECT
+        c.id,
+        c.post_id,
+        c.user_id,
+        c.content,
+        DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+        u.id AS 'user.id',
+        u.username AS 'user.username',
+        u.avatar AS 'user.avatar'
+        FROM post_comment c
+        JOIN user u ON c.user_id = u.id
+        WHERE c.post_id IN
+        <foreach collection="postIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY c.created_at ASC
+    </select>
+
+    <select id="getLikesByPostIds" resultType="com.x.pojo.dto.PostLikeDTO">
+        SELECT
+        l.id,
+        l.post_id,
+        l.user_id,
+        DATE_FORMAT(l.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+        u.id AS 'user.id',
+        u.username AS 'user.username',
+        u.avatar AS 'user.avatar'
+        FROM post_like l
+        JOIN user u ON l.user_id = u.id
+        WHERE l.post_id IN
+        <foreach collection="postIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY l.created_at ASC
+    </select>
+<!--    <select id="getAllPosts" resultType="com.x.pojo.dto.PostDTO">-->
+<!--        SELECT-->
+<!--        p.id,-->
+<!--        p.user_id,-->
+<!--        p.content,-->
+<!--        p.image_urls,-->
+<!--        p.created_at AS created_at,-->
+<!--        u.id AS 'author.id',-->
+<!--        u.username AS 'author.username',-->
+<!--        u.avatar AS 'author.avatar'-->
+<!--        FROM post p-->
+<!--        JOIN user u ON p.user_id = u.id-->
+<!--        WHERE p.status = 1-->
+<!--        ORDER BY p.created_at DESC-->
+<!--    </select>-->
+
+    <select id="getAllPosts" resultMap="PostDTOMap">
+        SELECT
+        p.id,
+        p.user_id,
+        p.content,
+        p.image_urls,
+        p.created_at,
+        u.id AS author_id,
+        u.username AS author_username,
+        u.avatar AS author_avatar
+        FROM post p
+        JOIN user u ON p.user_id = u.id
+        WHERE p.status = 1
+        ORDER BY p.created_at DESC
+    </select>
+
+    <resultMap id="PostDTOMap" type="com.x.pojo.dto.PostDTO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="content" property="content"/>
+        <result column="created_at" property="createdAt"/>
+        <!-- JSON -> List<String> -->
+        <result column="image_urls" property="imageUrls"
+                typeHandler="com.x.utils.JsonStringListTypeHandler"/>
+
+        <!-- 嵌套对象 author -->
+        <association property="author" javaType="com.x.pojo.dto.UserSimpleDTO">
+            <id column="author_id" property="id"/>
+            <result column="author_username" property="username"/>
+            <result column="author_avatar" property="avatar"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllComments" resultType="com.x.pojo.dto.PostCommentDTO">
+        SELECT
+        c.id,
+        c.post_id,
+        c.user_id,
+        c.content,
+        DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+        u.id AS 'user.id',
+        u.username AS 'user.username',
+        u.avatar AS 'user.avatar'
+        FROM post_comment c
+        JOIN user u ON c.user_id = u.id
+        ORDER BY c.created_at ASC
+    </select>
+    <select id="getAllLikes" resultType="com.x.pojo.dto.PostLikeDTO">
+        SELECT
+        l.id,
+        l.post_id,
+        l.user_id,
+        DATE_FORMAT(l.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+        u.id AS 'user.id',
+        u.username AS 'user.username',
+        u.avatar AS 'user.avatar'
+        FROM post_like l
+        JOIN user u ON l.user_id = u.id
+        ORDER BY l.created_at ASC
+    </select>
+    <select id="getPostGrowthData" resultType="java.lang.Long">
+
+        SELECT
+            IFNULL(COUNT(p.id), 0) AS count
+        FROM (
+            SELECT CURDATE() - INTERVAL 6 DAY AS date
+            UNION ALL SELECT CURDATE() - INTERVAL 5 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 4 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 3 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 2 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 1 DAY
+            UNION ALL SELECT CURDATE()
+            ) AS d
+            LEFT JOIN post p ON DATE(p.created_at) = d.date
+        GROUP BY d.date
+        ORDER BY d.date;
+    </select>
+<!--    <select id="getPostsById" resultType="com.x.pojo.dto.PostDTO">-->
+<!--        SELECT-->
+<!--            p.id,-->
+<!--            p.user_id,-->
+<!--            p.content,-->
+<!--            p.image_urls,-->
+<!--            p.created_at AS created_at,-->
+<!--            u.id AS 'author.id',-->
+<!--                u.username AS 'author.username',-->
+<!--                u.avatar AS 'author.avatar'-->
+<!--        FROM post p-->
+<!--                 JOIN user u ON p.user_id = u.id-->
+<!--        WHERE p.user_id=#{friendId}-->
+
+<!--        ORDER BY p.created_at DESC-->
+<!--    </select>-->
+
+</mapper>

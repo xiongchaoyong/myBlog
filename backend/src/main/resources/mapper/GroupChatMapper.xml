@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.x.mapper.GroupChatMapper">
+    <insert id="createGroup" keyProperty="id" useGeneratedKeys="true">
+        insert into group_chat(group_name,group_avatar,group_account,creator_id)
+        values(#{groupName},#{groupAvatar},#{groupAccount},#{creatorId})
+    </insert>
+    <select id="getAll" resultType="com.x.pojo.vo.GroupVO">
+        SELECT
+            g.id,
+            g.group_avatar,
+            g.group_name,
+            g.group_account,
+            g.creator_id,
+               g.created_at,
+            u.username AS creator_name,
+            COUNT(m.id) AS member_count
+        FROM
+            group_chat g
+                LEFT JOIN
+            user u ON g.creator_id = u.id
+                LEFT JOIN
+            group_member m ON g.id = m.group_id
+        GROUP BY
+            g.id, g.group_avatar, g.group_name, g.group_account, g.creator_id, u.username;
+    </select>
+</mapper>
