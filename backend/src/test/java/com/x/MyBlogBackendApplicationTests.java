@@ -15,7 +15,8 @@ import java.util.List;
 })
 
 @SpringBootTest
-class SocialBackendApplicationTests {
+
+class MyBlogBackendApplicationTests {
 
     @Test
     void contextLoads() {
@@ -30,7 +31,7 @@ class SocialBackendApplicationTests {
 
 //        //使用FileSystemDocumentLoader读取指定目录下的知识库文档
 //        //并使用默认的文档解析器对文档进行解析
-//        Document document1 = FileSystemDocumentLoader.loadDocument("/Users/x/projects/myBlog/x-blog-backend/src/main/resources/测试文档.md");
+//        Document document1 = FileSystemDocumentLoader.loadDocument("/Users/x/projects/myBlog/x-blog-backend/src/main/resources/rag.md");
 //        List<Document> documents = Arrays.asList(document1);
 //
 //        //文本向量化并存入向量数据库：将每个片段进行向量化，得到一个嵌入向量

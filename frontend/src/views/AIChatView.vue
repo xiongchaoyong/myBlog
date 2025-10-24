@@ -10,8 +10,7 @@ import AIChat from '@/components/AIChat.vue'
 
 <style scoped>
 .ai-chat-view {
-    margin-left: 68px;
   height: 100vh;
-  width: 95%;
+  /* width: 95%; */
 }
 </style>

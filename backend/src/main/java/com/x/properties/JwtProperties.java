@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "social.jwt")
+@ConfigurationProperties(prefix = "blog.jwt")
 @Data
 public class JwtProperties {
 

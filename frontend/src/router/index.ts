@@ -63,7 +63,12 @@ const router = createRouter({
       path: '/ai-chat',
       name: 'AIChat',
       component: () => import("@/views/AIChatView.vue")
-    }
+    },
+    {
+      path: '/callback',
+      name: 'callback',
+      component: () => import("@/views/callback.vue")
+    },
   ],
 })
 

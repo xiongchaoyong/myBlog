@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "social.alias")
+@ConfigurationProperties(prefix = "blog.alias")
 @Data
 public class AliOssProperties {
     private String endpoint;

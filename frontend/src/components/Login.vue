@@ -1,12 +1,13 @@
 <template>
-  <div class="login-box">
+  <transition name="fade">
+  <div class="login-box" v-if="visible">
     <el-icon class="close-btn" @click="handleClose">
       <Close />
     </el-icon>
     <div class="login-header">
       <h2>{{ isLogin ? "登录" : "注册" }}</h2>
-      <p>{{ isLogin ? "欢迎回来" : "创建新账户" }}</p>
     </div>
+
     <el-form
       ref="formRef"
       :model="formData"
@@ -30,9 +31,9 @@
           size="large"
         />
       </el-form-item>
-      <el-form-item v-if="isLogin" prop="account">
+      <el-form-item v-if="isLogin" prop="emailOraccount">
         <el-input
-          v-model="formData.account"
+          v-model="formData.emailOraccount"
           placeholder="邮箱或账号"
           prefix-icon="User"
           size="large"
@@ -70,12 +71,30 @@
         </el-button>
       </el-form-item>
     </el-form>
+
+    
+    <div class="otherLogin" v-if="isLogin">
+      <p>其它登录方式</p>
+      <div class="icons">
+        <svg style="width: 1.3rem; height: 1.3rem">
+          <use xlink:href="#icon-QQ" fill="#1296db"></use>
+        </svg>
+        <svg style="width: 1.3rem; height: 1.3rem" @click="loginWithGithub">
+          <use xlink:href="#icon-github" fill="#1296db"></use>
+        </svg>
+        <svg style="width: 1.3rem; height: 1.3rem">
+          <use xlink:href="#icon-shoujihaoma" fill="#1296db"></use>
+        </svg>
+      </div>
+    </div>
+
     <div class="login-footer">
       <el-button type="text" @click="toggleMode">
         {{ isLogin ? "没有账户？立即注册" : "已有账户？立即登录" }}
       </el-button>
     </div>
   </div>
+  </transition>
 </template>
 
 <script setup lang="ts">
@@ -86,16 +105,16 @@ import { login, register, getUserById } from "@/api/uuser";
 import { useUserStore } from "@/stores/userStore";
 
 const props = defineProps<{ visible: boolean }>();
+
 const emit = defineEmits<{ (e: "close"): void; (e: "login-success"): void }>();
 
 const visible = ref(props.visible);
+
 watch(
   () => props.visible,
   (v) => (visible.value = v)
 );
-watch(visible, (v) => {
-  if (!v) emit("close");
-});
+
 
 const formRef = ref<FormInstance>();
 const isLogin = ref(true);
@@ -105,7 +124,7 @@ const formData = reactive({
   username: "",
   password: "",
   confirmPassword: "",
-  account: "",
+  emailOraccount: "",
 });
 
 // 状态管理
@@ -152,8 +171,15 @@ const toggleMode = () => {
 };
 const handleClose = () => {
   visible.value = false;
+  setTimeout(() => {
   emit("close");
+  }, 300);
 };
+
+
+//后端逻辑
+//qq邮箱注册
+//github、qq、手机号、密码登录
 const handleSubmit = async () => {
   if (!formRef.value) return;
   try {
@@ -161,11 +187,23 @@ const handleSubmit = async () => {
     loading.value = true;
 
     if (isLogin.value) {
-      // 调用登录API
+      //密码登录 (qq邮箱、账号)
+      let account = "";
+      let email = "";
       try {
+        //先判断emailOraccount是否是邮箱
+        if (formData.emailOraccount.includes("@")) {
+          //是邮箱
+          email = formData.emailOraccount;
+        } else {
+          //是账号
+          account = formData.emailOraccount;
+        }
+        
         const response = await login({
-          account: formData.account,
-          password: formData.password
+          email: email,
+          account: account, 
+          password: formData.password,
         });
 
         if (response.data.code === 1) {
@@ -208,7 +246,7 @@ const handleSubmit = async () => {
         return;
       }
     } else {
-      // 调用注册API
+      // 注册
       try {
         const response = await register({
           username: formData.username,
@@ -237,13 +275,23 @@ const handleSubmit = async () => {
     }
 
     visible.value = false;
-    emit("close");
   } catch (error) {
     console.error("表单验证失败:", error);
   } finally {
     loading.value = false;
   }
 };
+
+
+//github登录
+const loginWithGithub=()=> {
+      const clientId = 'Ov23liekxBjOJPcC1piu';
+      const redirectUri = 'http://localhost:5173/callback';
+      const state = Math.random().toString(36).substring(2); // 随机字符串防 CSRF
+      localStorage.setItem('github_oauth_state', state);
+      const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=user&state=${state}`;
+      window.location.href = url; // 跳转到 GitHub 授权
+    }
 </script>
 
 <style scoped lang="scss">
@@ -259,7 +307,26 @@ const handleSubmit = async () => {
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 9999;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn    0.3s ease-out;
+}
+
+
+/* transition动画定义 */
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;  /* 开始和结束透明 */
+  transform: translate(-50%, -55%); /* 可加轻微位移效果 */
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
 }
 
 .close-btn {
@@ -324,6 +391,23 @@ const handleSubmit = async () => {
   to {
     opacity: 1;
     transform: translate(-50%, -50%);
+  }
+}
+
+.otherLogin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  p{
+    margin-bottom: 12px;
+    color: #888;
+  }
+  .icons{
+    display: flex;
+    gap: 16px;
+    svg{
+      cursor: pointer;
+    }
   }
 }
 </style>

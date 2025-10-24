@@ -2,6 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.x.mapper.UserMapper">
+
+    <insert id="registerByGithub" parameterType="com.x.pojo.dto.UserRegisterDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user
+        (username, avatar, email, password, account)
+        VALUES
+        (
+        #{username},
+        #{avatar},
+        <if test="email != null and email != ''">#{email}</if>
+        <if test="email == null or email == ''">NULL</if>,
+        #{password},
+        #{account}
+        )
+    </insert>
+
+
     <update id="update">
         UPDATE user
         <set>

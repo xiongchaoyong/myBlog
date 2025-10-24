@@ -12,8 +12,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 public class UserRegisterDTO implements Serializable {
-    private String email;
+    private Long id;
+    private String email;  //邮箱时需要
     private String password;
     private String  username;
-    private String account;
+    private String account;  //插入时需要
+    private String avatar;  //第三方登录时需要
 }

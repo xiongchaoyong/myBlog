@@ -1,12 +1,10 @@
 <template>
+  <HeaderWave text="XChat"></HeaderWave>
   <SiderBar></SiderBar>
-
-  <div class="all">
     <div class="ai-chat-container">
       <!-- 头部导航条   top -->
       <div class="chat-header">
-        <h3>ChatX</h3>
-      </div>
+        <!-- <h3>ChatX</h3> -->
 
       <!-- 聊天消息区域 -->
          <div v-if="waitSessionList"  class="chat" >
@@ -261,7 +259,7 @@ import chatMessage from "@/api/chatMessage";
 import session, { type Session } from "@/api/session";
 import SiderBar from "./SiderBar.vue";
 import Loading from "./Loading.vue";
-
+import HeaderWave from "./HeaderWave.vue";
 //初始化
 // 组件挂载后滚动到底部
 const waitSessionList=ref(true)
@@ -659,7 +657,8 @@ function formatCreatedTime(timeArray: number[]): string {
   border-left: 4px solid #1890ff; /* 左侧蓝色标记 */
 }
 .ai-chat-container {
-  position: relative;
+  width: 100%;
+  // position: relative;
   background-color: white;
 }
 
@@ -690,9 +689,7 @@ function formatCreatedTime(timeArray: number[]): string {
   display: flex;
   height: 80vh;
 }
-.all {
-  height: 100vh;
-}
+
 .chat-messages {
   position: relative;
   flex: 1;
@@ -940,7 +937,7 @@ function formatCreatedTime(timeArray: number[]): string {
   background: white;
   padding: 20px 24px;
   border-top: 1px solid #e5e7eb;
-  position: sticky;
+  // position: sticky;
   bottom: 0;
 }
 

@@ -1,4 +1,5 @@
 <template>
+  <HeaderWave text="发表文章" />
   <div class="publish-page">
     <!-- 全局加载组件 -->
     <Loading class="page-loading" :show="isPublishing" text="正在发表文章..." :mask="true"/>
@@ -6,10 +7,6 @@
 
     <SiderBar />
     <div class="publish-container">
-      <div class="publish-header">
-        <h1 class="page-title">发表文章</h1>
-        <p class="page-desc">在这里创建和编辑你的文章内容</p>
-      </div>
       <div class="publish-form">
         <!-- 文章基本信息 -->
         <div class="form-section">
@@ -201,7 +198,7 @@ import { formatLocalDate, formatShortDate } from '@/utils/dateUtils'
 import { marked } from 'marked'
 import { useArticleStore } from '@/stores/articleStore'
 import { useCategoryStore } from '@/stores/categoryStore'
-
+import HeaderWave from '@/components/HeaderWave.vue'
 import { Emoji } from '@vavt/v3-extension';
 import '@vavt/v3-extension/lib/asset/Emoji.css';
 import { Plus } from '@element-plus/icons-vue'

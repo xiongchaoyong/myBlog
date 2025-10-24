@@ -1,4 +1,5 @@
 <template>
+  <HeaderWave text="工具大全" />
   <div class="tool-cards-container" v-if="isLoading">
     <Loading :show="isLoading" text="好累呀,再等一会会!" :mask="true"></Loading>
   </div>
@@ -90,6 +91,7 @@ const userStore=useUserStore()
 import type { Tool } from '@/api/tool'
 import { useToolStore } from '@/stores/toolStore'
 import Loading from './Loading.vue'
+import HeaderWave from './HeaderWave.vue'
 
 // API 基础 URL
 const API_BASE_URL = import.meta.env.VITE_SERVER_URL

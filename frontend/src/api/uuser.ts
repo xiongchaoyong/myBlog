@@ -4,6 +4,7 @@ import request from '@/utils/request'
  * 用户登录数据传输对象
  */
 export interface UserLoginDTO {
+  email: string
   account: string
   password: string
 }
@@ -88,6 +89,15 @@ export function getUserById(id: number) {
   return request<Result<User>>({
     url: `/user/user/getById/${id}`,
     method: 'get'
+  })
+}
+
+export function githubLogin(code: string) {
+  return request<Result<UserLoginVO>>({
+    url: '/user/user/github/login',
+    method: 'post',
+    //ES6 语法 ,相当于{ code: code }
+    data: { code }
   })
 }
 

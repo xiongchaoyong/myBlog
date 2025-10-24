@@ -213,7 +213,7 @@ onMounted(() => {
 <style scoped>
 .hot-trends {
   padding: 20px;
-  background: #f5f5f5;
+  background: white;
   min-height: 100vh;
 }
 

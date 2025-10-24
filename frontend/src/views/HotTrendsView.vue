@@ -1,31 +1,24 @@
 <template>
+    <HeaderWave text="热搜" />
+        <SiderBar />
   <div class="hot-trends-view">
-    <SiderBar />
-    <div class="main-content">
       <HotTrends />
-    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import SiderBar from '@/components/SiderBar.vue'
 import HotTrends from '@/components/HotTrends.vue'
+import HeaderWave from '@/components/HeaderWave.vue'
 </script>
 
 <style scoped>
 .hot-trends-view {
   display: flex;
   min-height: 100vh;
-}
-
-.main-content {
-  flex: 1;
-  margin-left: 64px; /* 侧边栏宽度 */
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-  }
+  margin-left: 150px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  width: 77%;
 }
 </style>

@@ -30,7 +30,7 @@ public class EmbeddingStoreConfig {
                         .build())
                 .build();
 
-//        Document document3 = FileSystemDocumentLoader.loadDocument("/Users/x/projects/myBlog/x-blog-backend/src/main/resources/测试文档.md");
+//        Document document3 = FileSystemDocumentLoader.loadDocument("/Users/x/projects/myBlog/x-blog-backend/src/main/resources/rag.md");
 //        EmbeddingStoreIngestor
 //                .builder()
 //                .embeddingStore(embeddingStore)

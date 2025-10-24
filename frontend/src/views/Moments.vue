@@ -1,11 +1,12 @@
 <template>
+  <HeaderWave text="动态" />
   <SiderBar />
   <div class="moments">
     <div v-if="isLoading">
       <Loading :show="isLoading" text="请稍等哦!" :mask="true"></Loading>
     </div>
     <!-- 朋友圈封面区域 -->
-    <div class="cover-section">
+    <!-- <div class="cover-section">
       <div class="cover">
         <el-image
           :src="loginStore.user?.cover || defaultCover"
@@ -13,16 +14,16 @@
           class="cover-image"
         />
 
-        <!-- 发布按钮 -->
-        <div class="publish-btn" v-if="loginStore.isLoggedIn && !isLoadingPosts">
-          <el-button type="primary" @click="showPublishDialog = true">
-            <el-icon>
-              <Edit />
-            </el-icon>
-            发布
-          </el-button>
-        </div>
-      </div>
+        
+    </div> -->
+
+    <div class="publish-btn" v-if="loginStore.isLoggedIn && !isLoadingPosts">
+      <el-button type="primary" @click="showPublishDialog = true">
+        <el-icon>
+          <Edit />
+        </el-icon>
+        发布
+      </el-button>
     </div>
 
     <!-- 主要内容区域 -->
@@ -116,7 +117,6 @@
                       :size="20"
                     >
                       <Apple />
-                      
                     </el-icon>
                     {{ moment?.likes?.length || 0 }}
                   </el-button>
@@ -134,7 +134,9 @@
 
                 <!-- 点赞列表 -->
                 <div v-if="moment.likes?.length > 0" class="like-list">
-                 <el-icon style=" color:#FFBBFF ;font-size: 18px"><Apple /></el-icon>
+                  <el-icon style="color: #ffbbff; font-size: 18px"
+                    ><Apple
+                  /></el-icon>
                   <span
                     v-for="like in moment.likes"
                     :key="like.user?.id"
@@ -267,6 +269,7 @@ import defaultCover from "@/assets/默认封面.png";
 import Loading from "@/components/Loading.vue";
 import type { UploadUserFile } from "element-plus";
 import formatDate from "@/utils/timeFormate";
+import HeaderWave from "@/components/HeaderWave.vue";
 
 const uploadUrl = import.meta.env.VITE_SERVER_URL;
 
@@ -285,19 +288,18 @@ const isLoading = ref(false);
 
 onMounted(() => {
   fetchMomentsList();
-
 });
 //初始化
 const isLoadingPosts = ref(false);
 const fetchMomentsList = async () => {
   if (postStore.getMonentList?.length > 0) {
-      //先用本地缓存，同时请求获得最新的数据
-      const res= await Post.getPosts();
-      if(res.data.code === 1){
-        postStore.setMomentsList(res.data.data);
-      }
-      return
-  };
+    //先用本地缓存，同时请求获得最新的数据
+    const res = await Post.getPosts();
+    if (res.data.code === 1) {
+      postStore.setMomentsList(res.data.data);
+    }
+    return;
+  }
   isLoadingPosts.value = true;
   try {
     const res = await Post.getPosts();
@@ -405,7 +407,7 @@ const handleComment = async (moment: Moment) => {
         id: -1,
         userId: loginStore.user?.id as number,
         content: value,
-        createdAt: formatDate(new Date,"all"),
+        createdAt: formatDate(new Date(), "all"),
         user: {
           id: loginStore.user?.id as number,
           username: loginStore.user?.username as string,
@@ -449,7 +451,6 @@ const handleImageChange = (
   publishForm.value.images = fileList;
 };
 
-
 // 处理图片上传成功
 const handleImageSuccess = (
   response: any,
@@ -487,7 +488,7 @@ const handlePublish = async () => {
     userId: loginStore.user?.id as number,
     content: form.content,
     imageUrls,
-    createdAt: formatDate(new Date(), 'all'),
+    createdAt: formatDate(new Date(), "all"),
     author: {
       id: loginStore.user?.id as number,
       username: loginStore.user?.username as string,
@@ -562,7 +563,7 @@ const handleDeleteMoment = (moment: Moment) => {
 <style scoped lang="scss">
 .moments {
   min-height: 100vh;
-  background-color: #f6d7f7;
+  // background-color: #f6d7f7;
   overflow-y: auto;
 }
 
@@ -606,7 +607,7 @@ const handleDeleteMoment = (moment: Moment) => {
 
 .publish-btn {
   position: absolute;
-  top: 20px;
+  top: 320px;
   right: 20px;
   z-index: 10;
 }
@@ -734,7 +735,7 @@ const handleDeleteMoment = (moment: Moment) => {
       color: #606266;
 
       &.liked {
-        color: #FFBBFF;
+        color: #ffbbff;
       }
     }
   }

@@ -2,33 +2,13 @@
   <div class="layout-container">
     <!-- 主要内容 -->
     <div class="main-content">
-      <!-- 头像 -->
-      <div class="avatar-container" :class="{ 'avatar-animate': showAvatar }">
-        <img src="@/assets/qq头像.jpg" alt="头像" class="avatar" />
-      </div>
-
-      <!-- 打字机文字 -->
-      <div class="text-container" v-show="showText">
-        <h1 class="greeting">{{ displayText }}</h1>
-        <div class="cursor" v-show="showCursor">|</div>
-      </div>
-
-      <!-- 按钮组 -->
-      <!-- <div class="buttons-container" v-show="showButtons">
-        <button class="btn btn-primary" @click="gotoHome">
-          进入博客
-        </button>
-        <button class="btn btn-secondary" @click="gotoAbout">
-          关于博客
-        </button>
-      </div> -->
+     <h3>朝永的博客</h3>
     </div>
   </div>
 </template>
 <script setup>
 import { ref, onMounted } from 'vue'
 import router from '@/router'
-import StarryBackground from '@/components/StarryBackground.vue'
 
 // 动画状态控制
 const showAvatar = ref(false)
@@ -84,7 +64,10 @@ onMounted(() => {
 </script>
 <style scoped>
 .layout-container {
-  background-color: #f1bef1;
+  background-image: url('@/assets/bgc.jpeg');
+  background-size: cover;
+  background-position: center;
+  
   height: 100vh;
   overflow: hidden;
   display: flex;
@@ -93,10 +76,38 @@ onMounted(() => {
   justify-content: center;
 }
 
+/* 加上遮罩层 */
+.layout-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: rgba(0, 0, 0, 0.4); 黑色遮罩，透明度40% */
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.2));
+  z-index: 1;
+}
+
+/* 让内容显示在遮罩上方 */
+.layout-container > * {
+  position: relative;
+  z-index: 2;
+}
+
 .main-content {
   z-index: 10;
   width: 100%;
   text-align: center;
+  
+}
+.main-content h3{
+  font-size: 42px;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  letter-spacing: 2px;
 }
 
 /* 头像样式 */

@@ -1,8 +1,9 @@
 <template>
   <div class="allall">
+          <SiderBar />
+
     <Layout />
     <div class="all">
-      <SiderBar v-show="showSidebar" />
 
       <!-- 文章列表区域 -->
       <div class="article-list">
@@ -229,13 +230,13 @@
         <el-carousel   :interval="3000" height="260px" motion-blur arrow="never">
           <el-carousel-item v-for="(item, index) in slides" :key="index">
             <div class="card-content">
-              <img v-if="item.imageUrls.length===0" class="card-image" src="../assets/默认封面.png" alt="">
+              <img v-if="item?.imageUrls?.length===0" class="card-image" src="../assets/默认封面.png" alt="">
               <img v-else
-                :src="item.imageUrls[0]"
+                :src="item?.imageUrls[0]"
                 class="card-image"
               />
-              <span class="time">{{ item.createdAt }}</span>
-              <p class="text">{{ item.content }}</p>
+              <span class="time">{{ item?.createdAt }}</span>
+              <p class="text">{{ item?.content }}</p>
             </div>
           </el-carousel-item>
         </el-carousel>
@@ -270,6 +271,8 @@
       </div>
     </div>
   </div>
+      <waves></waves>
+
 </template>
 
 <script setup lang="ts">
@@ -288,6 +291,7 @@ import CategroyWord from "@/components/CategoryWord.vue";
 import type { Moment } from "@/api/Post";
 import Post from "@/api/Post";
 import {getMyArticleCount} from "@/api/article";
+import waves from "@/components/waves.vue";
 
 
 const categories = ref<Category[]>([]);
@@ -340,21 +344,8 @@ const handleArticleClick = (article: Article) => {
   router.push(`/article/${article.id}`);
 };
 
-//控制siderbar的显示时机
-const showSidebar = ref(false);
 
-const handleScroll = () => {
-  // 首屏高度：window.innerHeight
-  showSidebar.value = window.scrollY > window.innerHeight;
-};
 
-onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
 
 const slides = ref<Moment[]>([]);
 const postCount = ref(0);
@@ -426,7 +417,7 @@ function getRunningDays(startDate: string): number {
 .all {
   display: flex;
   min-height: 100vh;
-  background-color: #ffe1ff !important;
+  /* background-color: #ffe1ff !important; */
   position: relative;
 }
 

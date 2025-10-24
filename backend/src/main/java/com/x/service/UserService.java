@@ -10,6 +10,14 @@ import com.x.pojo.vo.UserSearchVO;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
+import java.util.Map;
+
+/**
+ * UserService 类
+ * 作者：朝永
+ * 日期：2025/10/22
+ * 描述：
+ */
 
 public interface UserService {
     UserInfo login(UserLoginDTO userLoginDTO) throws LoginException;
@@ -22,17 +30,9 @@ public interface UserService {
 
     UserSearchVO searchByAccount(String account);
 
-    void adminLogin(UserLoginDTO userLoginDTO);
-
-    List<User> getAllUsers();
-
-    void blockUser(Long id);
-
-    void recoverUser(Long id);
-
     List<UserRecommendVO> getRecommendUsers(Long id);
 
-    void setAdmin(Long id);
-
     Long getUserCount();
+
+    Long githubLogin(Map<String, String>  body) ;
 }

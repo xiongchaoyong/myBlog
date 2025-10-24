@@ -20,6 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * UserController 类
+ * 作者：朝永
+ * 日期：2025/10/22
+ * 描述：用户接口
+ */
+
 @RequestMapping("/user/user")
 @RestController
 @CrossOrigin
@@ -74,4 +82,21 @@ public class UserController {
         Long count=userService.getUserCount();
         return Result.success(count);
     }
+
+
+    @PostMapping("/github/login")
+    public Result<UserLoginVO> githubLogin(@RequestBody Map<String, String> body) throws Exception {
+        Long id=userService.githubLogin(body);
+        Map<String,Object> claims=new HashMap<>();
+        claims.put("USER_ID",id);
+        claims.put("USER_ROLE",0);
+        String token= JwtUtil.createJWT(
+                jwtProperties.getUserSecretKey(),
+                jwtProperties.getUserTtl(),
+                claims);
+        UserLoginVO userLoginVO=UserLoginVO.builder().id(id).token(token).build();
+        return Result.success(userLoginVO);
+    }
+
 }
+
