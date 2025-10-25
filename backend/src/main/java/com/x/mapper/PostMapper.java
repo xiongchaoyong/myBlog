@@ -16,6 +16,7 @@ public interface PostMapper {
 
     List<PostLikeDTO> getLikesByPostIds(@Param("postIds") List<Long> postIds);
 
+
     @Insert("insert into post (user_id,content,image_urls) values (#{userId}" +
             ",#{content},#{imageUrls,typeHandler=com.x.utils.JsonStringListTypeHandler})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
@@ -43,6 +44,12 @@ public interface PostMapper {
 
     @Select("select count(*) from post")
     Long getPostsCount();
+
+    List<PostDTO> getPostsByIds(List<Integer> ids);
+
+    List<PostCommentDTO> getCommentsByIds(List<Integer> ids);
+
+    List<PostLikeDTO> getLikesByIds(List<Integer> ids);
 
 //    List<PostDTO> getPostsById(Long friendId);
 }

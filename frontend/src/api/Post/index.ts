@@ -74,4 +74,15 @@ function getPostsCount(){
   });
 }
 
-export default { getPosts, sendPost, deletePost, getFivePosts, getMyPostsCount, getPostsCount };
+function getScrollPosts(max: number, offset: number) {
+  return request({
+    url: `/user/post/scroll`,
+    method: "get",
+    params: {
+      max,
+      offset
+    }
+  });
+}
+
+export default { getPosts, sendPost, deletePost, getFivePosts, getMyPostsCount, getPostsCount ,getScrollPosts};

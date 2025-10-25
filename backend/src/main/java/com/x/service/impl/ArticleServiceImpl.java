@@ -1,25 +1,31 @@
 package com.x.service.impl;
 
+import com.x.common.constant.RedisKeyConstants;
 import com.x.context.BaseContext;
 import com.x.mapper.ArticleMapper;
 import com.x.pojo.dto.ArticleForm;
 import com.x.pojo.dto.ArticleStatsDTO;
 import com.x.pojo.dto.ArticleUpdateDTO;
 import com.x.pojo.entity.Article;
+import com.x.pojo.vo.ScrollPageVO;
 import com.x.service.ArticleService;
+import com.x.utils.ScrollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章服务实现类
  * @author Your Name
  * @date 2024-01-01
  */
+@SuppressWarnings("ALL")
 @Slf4j
 @Service
 
@@ -28,7 +34,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ArticleMapper articleMapper;
 
+    @Autowired
 
+    private RedisTemplate redisTemplate;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -55,6 +63,9 @@ public class ArticleServiceImpl implements ArticleService {
         article.setUpdateTime(java.time.LocalDateTime.now());
         // 保存文章
         articleMapper.insert(article);
+        //保存到redis
+        redisTemplate.opsForZSet().add(RedisKeyConstants.STORE_ARTICLEIDS, String.valueOf(article.getId()),System
+                .currentTimeMillis());
         return article;
     }
 
@@ -188,5 +199,15 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Long getMyArticleCount() {
         return articleMapper.getMyArticleCount();
+    }
+
+    @Override
+    public ScrollPageVO<Article> getScrollArticles(Long max, Integer offset) {
+        Map<String, Object> map = ScrollUtil.ScllorGetIds(RedisKeyConstants.STORE_ARTICLEIDS, 0, max, offset, 5,redisTemplate);
+        Long minTime = (Long) map.get("minTime");
+        Integer os = (Integer) map.get("os");
+        List<Integer> ids = (List<Integer>) map.get("ids");
+        List<Article> articles = articleMapper.getArticlesByIds(ids);
+        return new ScrollPageVO(minTime,os,articles);
     }
 }

@@ -9,6 +9,7 @@ import com.x.pojo.dto.ArticleForm;
 import com.x.pojo.dto.ArticleStatsDTO;
 import com.x.pojo.dto.ArticleUpdateDTO;
 import com.x.pojo.entity.Article;
+import com.x.pojo.vo.ScrollPageVO;
 import com.x.service.ArticleService;
 import com.x.utils.AuthJudjeUtil;
 import com.x.utils.Result;
@@ -240,5 +241,12 @@ public class ArticleController {
             log.error("获取文章数量失败", e);
             return Result.error("获取文章数量失败");
         }
+    }
+
+
+
+    @GetMapping("/scroll")
+    public Result<ScrollPageVO<Article>> getScrollArticles(@RequestParam Long max, @RequestParam Integer offset){
+        return Result.success(articleService.getScrollArticles(max, offset));
     }
 }

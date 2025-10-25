@@ -33,10 +33,7 @@
       </div>
       <!-- 动态列表 -->
       <div class="moments-list" v-else>
-        <div
-          v-if="postStore.getMonentList?.length === 0 && !isLoadingPosts"
-          class="empty-moments"
-        >
+        <div v-if="postLists.length === 0 && !isLoadingPosts" class="empty-moments">
           <el-icon class="empty-icon">
             <ChatDotRound />
           </el-icon>
@@ -44,18 +41,11 @@
         </div>
 
         <div v-else class="moments-container">
-          <div
-            v-for="(moment, index) in postStore.getMonentList"
-            :key="moment.id"
-            class="moment-item"
-          >
+          <div v-for="(moment, index) in postLists" :key="moment.id" class="moment-item">
             <!-- 用户头像 -->
             <div class="moment-avatar">
-              <Avatar
-                :avatar="moment.author?.avatar"
-                :username="moment.author?.username || '用户'"
-                :style="{ width: '50px', height: '50px', fontSize: '20px' }"
-              />
+              <Avatar :avatar="moment.author?.avatar" :username="moment.author?.username || '用户'"
+                :style="{ width: '50px', height: '50px', fontSize: '20px' }" />
             </div>
 
             <!-- 动态内容 -->
@@ -72,59 +62,33 @@
               </div>
 
               <!-- 动态图片 -->
-              <div
-                v-if="moment.imageUrls && moment.imageUrls.length > 0"
-                class="moment-images"
-              >
-                <div
-                  v-for="(image, index) in moment.imageUrls.slice(0, 9)"
-                  :key="index"
-                  class="image-item"
-                >
-                  <el-image
-                    :src="image"
-                    fit="cover"
-                    :preview-src-list="moment.imageUrls"
-                    :initial-index="index"
-                    preview-teleported
-                    hide-on-click-modal
-                  />
+              <div v-if="moment.imageUrls && moment.imageUrls.length > 0" class="moment-images">
+                <div v-for="(image, index) in moment.imageUrls.slice(0, 9)" :key="index" class="image-item">
+                  <el-image :src="image" fit="cover" :preview-src-list="moment.imageUrls" :initial-index="index"
+                    preview-teleported hide-on-click-modal />
                 </div>
               </div>
 
               <!-- 动态操作 -->
               <div class="moment-actions">
                 <div class="action-buttons">
-                  <el-button
-                    type="text"
-                    size="small"
-                    @click="handleLike(moment)"
-                    :class="{
+                  <el-button type="text" size="small" @click="handleLike(moment)" :class="{
                       liked: moment.likes?.some(
-                        (like) => like.userId === loginStore.user?.id
+                        (like:any) => like.userId === loginStore.user?.id
                       ),
-                    }"
-                    :loading="isDoingLike && moment.id == currentDoingLikeId"
-                  >
-                    <el-icon
-                      :style="{
+                    }" :loading="isDoingLike && moment.id == currentDoingLikeId">
+                    <el-icon :style="{
                         color: moment.likes?.some(
-                          (like) => like.userId === loginStore.user?.id
+                          (like:any) => like.userId === loginStore.user?.id
                         )
                           ? '#FFBBFF'
                           : 'inherit',
-                      }"
-                      :size="20"
-                    >
+                      }" :size="20">
                       <Apple />
                     </el-icon>
                     {{ moment?.likes?.length || 0 }}
                   </el-button>
-                  <el-button
-                    type="text"
-                    size="small"
-                    @click="handleComment(moment)"
-                  >
+                  <el-button type="text" size="small" @click="handleComment(moment)">
                     <el-icon :size="20">
                       <ChatDotRound />
                     </el-icon>
@@ -134,58 +98,41 @@
 
                 <!-- 点赞列表 -->
                 <div v-if="moment.likes?.length > 0" class="like-list">
-                  <el-icon style="color: #ffbbff; font-size: 18px"
-                    ><Apple
-                  /></el-icon>
-                  <span
-                    v-for="like in moment.likes"
-                    :key="like.user?.id"
-                    style="font-size: 18px"
-                  >
-                    <el-tooltip
-                      effect="light"
-                      :content="like.user?.username || '用户'"
-                      placement="top"
-                    >
-                      <Avatar
-                        :avatar="like.user?.avatar"
-                        :username="like.user?.username || '用户'"
-                        :style="{
+                  <el-icon style="color: #ffbbff; font-size: 18px">
+                    <Apple />
+                  </el-icon>
+                  <span v-for="like in moment.likes" :key="like.user?.id" style="font-size: 18px">
+                    <el-tooltip effect="light" :content="like.user?.username || '用户'" placement="top">
+                      <Avatar :avatar="like.user?.avatar" :username="like.user?.username || '用户'" :style="{
                           width: '35px',
                           height: '35px',
                           fontSize: '12px',
                           cursor: 'pointer',
-                        }"
-                      />
+                        }" />
                     </el-tooltip>
                   </span>
                 </div>
 
                 <!-- 评论列表 -->
                 <div v-if="moment.comments?.length > 0" class="comment-list">
-                  <div
-                    v-for="comment in moment.comments"
-                    :key="comment.id"
-                    class="comment-item"
-                  >
+                  <div v-for="comment in moment.comments" :key="comment.id" class="comment-item">
                     <div>
-                      <span class="comment-user"
-                        >{{ comment.user?.username }}
-                      </span>
-                      <span class="comment-content"
-                        >:{{ comment.content }}</span
-                      >
+                      <el-tooltip effect="light" :content="comment.user?.username || '用户'" placement="top">
+<Avatar :avatar="comment.user?.avatar" :username="comment.user?.username || '用户'" :style="{
+                          width: '35px',
+                          height: '35px',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                        }" />                      </el-tooltip>
+                      <span class="comment-content">:{{ comment.content }}</span>
                     </div>
                     <span class="comment-time">{{ comment.createdAt }}</span>
                   </div>
                 </div>
 
                 <!-- 删除按钮，仅本人动态显示，右上角 -->
-                <el-icon
-                  v-if="moment.userId === loginStore.user?.id"
-                  class="delete-icon"
-                  @click="handleDeleteMoment(moment)"
-                  style="
+                <el-icon v-if="moment.userId === loginStore.user?.id" class="delete-icon"
+                  @click="handleDeleteMoment(moment)" style="
                     position: absolute;
                     right: 10px;
                     top: 10px;
@@ -193,8 +140,7 @@
                     cursor: pointer;
                     font-size: 22px;
                     color: #f56c6c;
-                  "
-                >
+                  ">
                   <Delete />
                 </el-icon>
               </div>
@@ -208,27 +154,13 @@
     <el-dialog v-model="showPublishDialog" title="发布动态" width="500px">
       <el-form :model="publishForm" label-width="80px">
         <el-form-item label="内容">
-          <el-input
-            v-model="publishForm.content"
-            type="textarea"
-            :rows="4"
-            placeholder="分享你的生活..."
-          />
+          <el-input v-model="publishForm.content" type="textarea" :rows="4" placeholder="分享你的生活..." />
         </el-form-item>
 
         <el-form-item label="图片">
-          <el-upload
-            ref="upload"
-            :action="`${uploadUrl}/user/upload`"
-            :headers="headers"
-            list-type="picture-card"
-            :on-change="handleImageChange"
-            :on-success="handleImageSuccess"
-            :file-list="publishForm.images"
-            :limit="9"
-            :on-exceed="handleImageExceed"
-            multiple
-          >
+          <el-upload ref="upload" :action="`${uploadUrl}/user/upload`" :headers="headers" list-type="picture-card"
+            :on-change="handleImageChange" :on-success="handleImageSuccess" :file-list="publishForm.images" :limit="9"
+            :on-exceed="handleImageExceed" multiple>
             <el-icon>
               <Plus />
             </el-icon>
@@ -239,9 +171,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showPublishDialog = false">取消</el-button>
-          <el-button :loading="isLoading" type="primary" @click="handlePublish"
-            >发布</el-button
-          >
+          <el-button :loading="isLoading" type="primary" @click="handlePublish">发布</el-button>
         </span>
       </template>
     </el-dialog>
@@ -249,7 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import {
   Edit,
   ChatDotRound,
@@ -286,34 +216,100 @@ const headers = {
 
 const isLoading = ref(false);
 
-onMounted(() => {
-  fetchMomentsList();
-});
-//初始化
 const isLoadingPosts = ref(false);
-const fetchMomentsList = async () => {
-  if (postStore.getMonentList?.length > 0) {
-    //先用本地缓存，同时请求获得最新的数据
-    const res = await Post.getPosts();
-    if (res.data.code === 1) {
-      postStore.setMomentsList(res.data.data);
-    }
-    return;
-  }
-  isLoadingPosts.value = true;
+const postLists = ref<Moment[]>([]);
+const max = ref(Date.now()); // 初始化为当前时间戳
+const offset = ref(0);
+const hasMore = ref(true); // 是否还有更多数据
+const isLoadingMore = ref(false); // 是否正在加载更多
+
+// 加载下一页数据
+const loadNextPage = async () => {
+  if (!hasMore.value || isLoadingMore.value) return;
+  
+  isLoadingMore.value = true;
   try {
-    const res = await Post.getPosts();
+    const res = await Post.getScrollPosts(max.value, offset.value);
     if (res.data.code === 1) {
-      postStore.setMomentsList(res.data.data);
-      isLoadingPosts.value = false;
+      const data = res.data.data;
+      const newPosts = data.objects;
+      
+      if (newPosts.length === 0 || newPosts.length < 5) {
+        hasMore.value = false;
+      } else {
+        postLists.value.push(...newPosts);
+        // 使用返回的max和offset更新状态
+        max.value = data.max;
+        offset.value = data.offset;
+      }
     } else {
       ElMessage.error("获取动态失败");
     }
   } catch (err) {
-    isLoadingPosts.value = false;
     ElMessage.error("获取动态失败");
+  } finally {
+    isLoadingMore.value = false;
   }
 };
+
+// 处理滚动事件
+const handleScroll = async () => {
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  const windowHeight = window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+  
+  if (documentHeight - scrollTop - windowHeight < 100) {
+    await loadNextPage();
+  }
+};
+
+onMounted(async () => {
+  // 初始加载
+  const res=await Post.getScrollPosts(max.value, offset.value);
+  if (res.data.code === 1) {
+    const data = res.data.data;
+    const newPosts = data.objects;
+    if(newPosts.length === 0 || newPosts.length < 5){
+      hasMore.value = false;
+    }
+    postLists.value.push(...newPosts);
+    // 使用返回的max和offset更新状态
+    max.value = data.max;
+    offset.value = data.offset;
+  } else {
+    ElMessage.error("获取动态失败");
+  }
+  // 添加滚动监听
+  window.addEventListener('scroll', handleScroll);
+});
+
+onBeforeUnmount(() => {
+  // 移除滚动监听
+  window.removeEventListener('scroll', handleScroll);
+});
+// const fetchMomentsList = async () => {
+//   if (postStore.getMonentList?.length > 0) {
+//     //先用本地缓存，同时请求获得最新的数据
+//     const res = await Post.getPosts();
+//     if (res.data.code === 1) {
+//       postStore.setMomentsList(res.data.data);
+//     }
+//     return;
+//   }
+//   isLoadingPosts.value = true;
+//   try {
+//     const res = await Post.getPosts();
+//     if (res.data.code === 1) {
+//       postStore.setMomentsList(res.data.data);
+//       isLoadingPosts.value = false;
+//     } else {
+//       ElMessage.error("获取动态失败");
+//     }
+//   } catch (err) {
+//     isLoadingPosts.value = false;
+//     ElMessage.error("获取动态失败");
+//   }
+// };
 
 //处理点赞操作
 const isDoingLike = ref(false);
@@ -499,7 +495,6 @@ const handlePublish = async () => {
   });
 
   // 4. 先插入前端列表（乐观更新）
-  postStore.getMonentList.unshift(newMoment.value);
   showPublishDialog.value = false;
   publishForm.value = { content: "", images: [] };
   try {
@@ -510,13 +505,10 @@ const handlePublish = async () => {
       // 重置表单
       ElMessage.success("发布成功");
     } else {
-      // 发布失败 → 回滚
-      postStore.getMonentList.shift(); // 移除刚插入的第一个
       ElMessage.error("发布失败");
     }
   } catch (e) {
     // 请求异常 → 回滚
-    postStore.getMonentList.shift();
     ElMessage.error("发布失败");
   } finally {
     isLoading.value = false;
@@ -532,12 +524,8 @@ const handleDeleteMoment = (moment: Moment) => {
   })
     .then(async () => {
       // 从列表中移除
-      const index = postStore.getMonentList.findIndex(
-        (m) => m.id === moment.id
-      );
-      if (index !== -1) {
-        postStore.getMonentList.splice(index, 1);
-      }
+     
+     
       try {
         const res = await Post.deletePost(moment.id);
         if (res.data.code === 1) {
@@ -545,17 +533,14 @@ const handleDeleteMoment = (moment: Moment) => {
         } else {
           ElMessage.error(res.data.msg || "删除失败");
           // 从列表中添加回来
-          postStore.getMonentList.push(moment);
         }
       } catch (e) {
         ElMessage.error("删除失败，请重试");
         // 从列表中添加回来
-        postStore.getMonentList.push(moment);
       }
     })
     .catch(() => {
       // 从列表中添加回来
-      postStore.getMonentList.push(moment);
     });
 };
 </script>
@@ -750,6 +735,7 @@ const handleDeleteMoment = (moment: Moment) => {
     margin-bottom: 8px;
     font-size: 13px;
     color: #606266;
+
     .el-icon {
       color: #409eff;
       margin-right: 5px;
@@ -764,16 +750,15 @@ const handleDeleteMoment = (moment: Moment) => {
     .comment-item {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       margin-bottom: 8px;
       font-size: 13px;
+
       &:last-child {
         margin-bottom: 0;
       }
 
       .comment-user {
-        color: #d995e9;
-        font-weight: 500;
         margin-right: 5px;
         font-size: 20px;
       }
@@ -787,7 +772,7 @@ const handleDeleteMoment = (moment: Moment) => {
 
       .comment-content {
         color: #d995e9;
-        font-size: 14px;
+        font-size: 25px;
       }
     }
   }

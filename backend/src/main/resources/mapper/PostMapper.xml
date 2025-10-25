@@ -151,7 +151,60 @@
         GROUP BY d.date
         ORDER BY d.date;
     </select>
-<!--    <select id="getPostsById" resultType="com.x.pojo.dto.PostDTO">-->
+    <select id="getPostsByIds" resultMap="PostDTOMap">
+        SELECT
+        p.id,
+        p.user_id,
+        p.content,
+        p.image_urls,
+        p.created_at,
+        u.id AS author_id,
+        u.username AS author_username,
+        u.avatar AS author_avatar
+        FROM post p
+        JOIN user u ON p.user_id = u.id
+        WHERE p.id IN
+        <foreach item="id" collection="ids" index="index" separator="," close=")" open="(">
+                #{id}
+        </foreach>
+        ORDER BY p.created_at DESC
+    </select>
+    <select id="getCommentsByIds" resultType="com.x.pojo.dto.PostCommentDTO">
+        SELECT
+        c.id,
+        c.post_id,
+        c.user_id,
+        c.content,
+        DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+        u.id AS 'user.id',
+        u.username AS 'user.username',
+        u.avatar AS 'user.avatar'
+        FROM post_comment c
+        JOIN user u ON c.user_id = u.id
+        WHERE c.post_id IN
+        <foreach item="id" collection="ids" index="index" separator="," close=")" open="(">
+                #{id}
+        </foreach>
+        ORDER BY c.created_at ASC
+    </select>
+    <select id="getLikesByIds" resultType="com.x.pojo.dto.PostLikeDTO">
+        SELECT
+        l.id,
+        l.post_id,
+        l.user_id,
+        DATE_FORMAT(l.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+        u.id AS 'user.id',
+        u.username AS 'user.username',
+        u.avatar AS 'user.avatar'
+        FROM post_like l
+        JOIN user u ON l.user_id = u.id
+        WHERE l.post_id IN
+        <foreach item="id" collection="ids" index="index" separator="," close=")" open="(" >
+                #{id}
+        </foreach>
+        ORDER BY l.created_at ASC
+    </select>
+    <!--    <select id="getPostsById" resultType="com.x.pojo.dto.PostDTO">-->
 <!--        SELECT-->
 <!--            p.id,-->
 <!--            p.user_id,-->

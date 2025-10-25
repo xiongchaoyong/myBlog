@@ -4,6 +4,7 @@ import com.x.pojo.dto.ArticleForm;
 import com.x.pojo.dto.ArticleStatsDTO;
 import com.x.pojo.dto.ArticleUpdateDTO;
 import com.x.pojo.entity.Article;
+import com.x.pojo.vo.ScrollPageVO;
 
 import java.util.List;
 
@@ -67,4 +68,6 @@ public interface ArticleService {
     List<Long> getArticleIds(Integer categoryId);
 
     Long getMyArticleCount();
+
+    ScrollPageVO<Article> getScrollArticles(Long max, Integer offset);
 }

@@ -36,7 +36,11 @@ export interface Draft {
   createTime: string
   updateTime: string
 }
-
+export interface ScrollPageVO {
+  objects: Article[]
+  max: number
+  offset: number
+}
 
 /**
  * 发表文章
@@ -177,6 +181,17 @@ export const aiJudge=(articleData: ArticleForm)=>{
   })
 }
 
+
+export const getScrollArticles=(max:number,offset:number)=>{
+  return request({
+    url: '/user/articles/scroll',
+    method: 'get',
+    params:{
+      max,
+      offset
+    }
+  })
+}
 
 
 

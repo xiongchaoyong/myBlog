@@ -2,6 +2,7 @@ package com.x.service;
 
 import com.x.pojo.dto.PostDTO;
 import com.x.pojo.dto.SendPostDTO;
+import com.x.pojo.vo.ScrollPageVO;
 
 import java.util.List;
 
@@ -20,5 +21,6 @@ public interface PostService {
 
     Long getPostsCount();
 
-//    List<PostDTO> getMomentsListById(Long friendId);
+    ScrollPageVO<PostDTO> getScrollPosts(Long max, Integer offset);
+
 }

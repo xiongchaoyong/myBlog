@@ -72,6 +72,18 @@
         </where>
         ORDER BY publish_time DESC
     </select>
+    <select id="getArticlesByIds" resultType="com.x.pojo.entity.Article">
+        SELECT
+            id, title, content, summary, cover, category_id as categoryId,
+            view_count as viewCount, like_count as likeCount, comment_count as commentCount,
+            publish_time as publishTime, update_time as updateTime,user_id as userId
+        FROM article
+        WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        order by id desc
+    </select>
 
     <!-- 增加文章点赞数 -->
     <update id="incrementLikeCount">

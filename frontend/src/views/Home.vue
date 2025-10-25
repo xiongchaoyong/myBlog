@@ -6,11 +6,10 @@
     <div class="all">
 
       <!-- 文章列表区域 -->
-      <div class="article-list">
-        <Transition name="page-transition" mode="out-in">
-          <div :key="currentPage" class="articles-container">
+      <div class="article-list" ref="articleListRef">
+        <div class="articles-container">
             <!-- 有数据 -->
-            <template v-if="!pageInfo.isPageLoading && articles.length > 0">
+            <template v-if="!isLoading && articles?.length > 0">
               <div
                 v-for="(article, index) in articles"
                 :key="article?.id"
@@ -72,7 +71,7 @@
             </template>
 
             <!-- 骨架屏 -->
-            <template v-else-if="pageInfo.isPageLoading">
+            <template v-else-if="isLoading">
               <div
                 v-for="i in skeletonCount"
                 :key="i"
@@ -123,20 +122,16 @@
             <div v-else class="no-data">
               <el-empty description="暂无文章" />
             </div>
+            <!-- 加载状态 -->
+            <div v-if="isLoadingMore" class="loading-more">
+              <el-icon class="loading-icon"><Loading /></el-icon>
+              <span>加载中...</span>
+            </div>
+            <div v-else-if="!hasMore" class="no-more">
+              已经到底啦 ~
+            </div>
           </div>
-        </Transition>
 
-        <!-- 分页 -->
-        <div class="pagination-bottom" v-if="!isLoading">
-          <el-pagination
-            v-model="currentPage"
-            :page-size="5"
-            :total="pageInfo.count"
-            layout="total, prev, pager, next, jumper"
-            @current-change="handleCurrentChange"
-            background
-          />
-        </div>
       </div>
 
       <!-- 右边的内容 -->
@@ -227,7 +222,7 @@
           <CategroyWord></CategroyWord>
         </div>
 
-        <el-carousel   :interval="3000" height="260px" motion-blur arrow="never">
+        <!-- <el-carousel   :interval="3000" height="260px" motion-blur arrow="never">
           <el-carousel-item v-for="(item, index) in slides" :key="index">
             <div class="card-content">
               <img v-if="item?.imageUrls?.length===0" class="card-image" src="../assets/默认封面.png" alt="">
@@ -239,7 +234,7 @@
               <p class="text">{{ item?.content }}</p>
             </div>
           </el-carousel-item>
-        </el-carousel>
+        </el-carousel> -->
 
         <div class="info-card">
           <div class="card-header">
@@ -252,7 +247,7 @@
             </div>
             <div class="info-item">
               <span>文章数目：</span>
-              <strong>{{ pageInfo.count }}</strong>
+              <strong>{{ myArticleCount }}</strong>
             </div>
             <div class="info-item">
               <span>动态数目：</span>
@@ -281,10 +276,11 @@ import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useArticleStore } from "@/stores/articleStore";
 import { useCategoryStore } from "@/stores/categoryStore";
-import { type Article } from "@/api/article";
+import { type Article, type ScrollPageVO } from "@/api/article";
 import { type Category } from "@/api/category";
 import { formatFullDate } from "@/utils/dateUtils";
 import { ElSkeleton, ElSkeletonItem, ElEmpty } from "element-plus";
+import { Loading } from '@element-plus/icons-vue';
 import SiderBar from "@/components/SiderBar.vue";
 import Layout from "./Layout.vue";
 import CategroyWord from "@/components/CategoryWord.vue";
@@ -292,6 +288,7 @@ import type { Moment } from "@/api/Post";
 import Post from "@/api/Post";
 import {getMyArticleCount} from "@/api/article";
 import waves from "@/components/waves.vue";
+import { getScrollArticles } from "@/api/article";
 
 
 const categories = ref<Category[]>([]);
@@ -302,47 +299,121 @@ const categoryStore = useCategoryStore();
 //优化分页组件显示
 const isLoading = ref(true);
 
+// 状态变量
+const articleListRef = ref<HTMLElement | null>(null);
+const isLoadingMore = ref(false);
+const hasMore = ref(true);
+const max = ref(Date.now()); // 初始化为当前时间戳
+const offset = ref(0);
+const articles = ref<Article[]>([]);
+
+// 获取分页文章的方法
+const fetchScrollPage = async (currentMax: number, currentOffset: number): Promise<ScrollPageVO> => {
+  const response = await getScrollArticles(currentMax, currentOffset);
+
+  if (response.data.code === 1) {
+    return response.data.data;
+  }else{
+hasMore.value = false;
+  return {
+    objects: [],
+    max: 0,
+    offset: 0
+  };
+  }
+  
+};
+
 onMounted(async () => {
-  await articleStore.fetchArticlesByCategoryId(0, 1);
-  isLoading.value = false;
-  await categoryStore.fetchCategories().then((res) => (categories.value = res));
-});
-
-const pageInfo = computed(() =>
-  articleStore.getCategoryPageInfo(0, currentPage.value)
-);
-
-const articles = computed(() => {
-  return articleStore.getArticlesByCategoryId(0, currentPage.value);
-});
-
-const currentPage = ref(1);
-// 切页回调
-async function handleCurrentChange(page: number) {
-  currentPage.value = page;
-  // 如果当前页还没拉取过，就请求
-  await articleStore.fetchArticlesByCategoryId(0, page);
-}
-//骨架屏数量
-const skeletonCount = computed(() => {
-  const pageSize = 5;
-  const count = pageInfo.value.count || 0;
-  if (count === 0) return 5;
-
-  if (currentPage.value === 1) {
-    return pageSize;
-  } else if (currentPage.value === pageInfo.value.totalPages) {
-    const remaining = count - (currentPage.value - 1) * pageSize;
-    return remaining > 0 ? remaining : 0;
-  } else {
-    return pageSize;
+  try {
+    // 获取初始文章列表
+    const pageInfo = await fetchScrollPage(max.value, offset.value);
+    articles.value = pageInfo.objects;
+    max.value = pageInfo.max;
+    offset.value = pageInfo.offset;
+  } catch (error) {
+    console.error('初始化文章列表失败:', error);
+    ElMessage.error('加载文章失败，请稍后重试');
+  } finally {
+    isLoading.value = false;
   }
 });
+
+// 加载下一页数据
+const loadNextPage = async () => {
+  if (isLoadingMore.value || !hasMore.value) return;
+  
+  isLoadingMore.value = true;
+  try {
+    // 获取下一页信息
+    const pageInfo = await fetchScrollPage(max.value, offset.value);
+    console.log(pageInfo);
+    if (pageInfo== null || pageInfo == undefined) {
+      hasMore.value = false;
+      return;
+    }
+
+    // 直接更新文章列表和分页信息
+    articles.value = [...articles.value, ...pageInfo.objects];
+    max.value = pageInfo.max;
+    offset.value = pageInfo.offset;
+    if(articles?.value?.length % 5 !== 0){
+      hasMore.value = false;
+      console.log("没有更多文章了");
+    }
+  } catch (error) {
+    console.error('加载更多文章失败:', error);
+    ElMessage.error('加载更多文章失败，请稍后重试');
+  } finally {
+    isLoadingMore.value = false;
+  }
+};
+
+// 滚动事件处理
+const handleScroll = async () => {
+  if (!articleListRef.value) return;
+  
+  const articleList = articleListRef.value;
+  const articleListBottom = articleList.getBoundingClientRect().bottom;
+  const windowHeight = window.innerHeight;
+  
+  // 当文章列表底部距离视口底部小于100px时加载更多
+  if (articleListBottom - windowHeight <= 100) {
+    await loadNextPage();
+  }
+};
+
+// 添加和移除滚动监听
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
+
+//骨架屏数量（固定为5个）
+const skeletonCount = 5;
 
 //点击文章跳转
 const handleArticleClick = (article: Article) => {
   router.push(`/article/${article.id}`);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -361,14 +432,14 @@ const postStore = usePostStore();
 //获取注册人数
 //我的文章数目
 onMounted(async () => {
-  if(postStore.getMonentList?.length > 0){
-    for(let i=0; i<5;i++){
-      slides.value.push(postStore.getMonentList[i]);
-    }
-  }else{
-    const postRes = await Post.getFivePosts();
-    slides.value = postRes.data.data;
-  }
+  // if(postStore.getMonentList?.length > 0){
+  //   for(let i=0; i<5;i++){
+  //     slides.value.push(postStore.getMonentList[i]);
+  //   }
+  // }else{
+  //   const postRes = await Post.getFivePosts();
+  //   slides.value = postRes.data.data;
+  // }
   const postCountRes = await Post.getPostsCount();
     postCount.value = postCountRes.data.data;
 
@@ -489,8 +560,12 @@ function getRunningDays(startDate: string): number {
   line-height: 1.6;
   margin-bottom: 16px;
   display: -webkit-box;
+  display: -moz-box;
+  display: box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
+  box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -529,12 +604,6 @@ function getRunningDays(startDate: string): number {
   display: flex;
   gap: 20px; /* 两个时间横排 */
   margin-top: 6px;
-}
-
-.pagination-bottom {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
 }
 
 .right-content {
@@ -727,5 +796,28 @@ function getRunningDays(startDate: string): number {
   white-space: nowrap; /* 不换行 */
   overflow: hidden; /* 超出隐藏 */
   text-overflow: ellipsis; /* 超出显示省略号 */
+}
+
+.loading-more, .no-more {
+  text-align: center;
+  padding: 20px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-icon {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

@@ -98,4 +98,7 @@ public interface ArticleMapper {
 
     @Select("select count(*) from article where user_id = 12")
     Long getMyArticleCount();
+
+    List<Article> getArticlesByIds(List<Integer> ids);
+
 }

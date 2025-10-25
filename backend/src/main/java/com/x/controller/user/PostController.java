@@ -2,6 +2,7 @@ package com.x.controller.user;
 
 import com.x.pojo.dto.PostDTO;
 import com.x.pojo.dto.SendPostDTO;
+import com.x.pojo.vo.ScrollPageVO;
 import com.x.service.PostService;
 import com.x.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,6 @@ public class PostController {
         postService.deletePost(id);
         return Result.success("删除成功");
     }
-
-
     @GetMapping("/getFivePosts")
     public Result<List<PostDTO>> getFivePosts(){
         List<PostDTO> posts = postService.getFivePosts();
@@ -48,5 +47,11 @@ public class PostController {
     public Result<Long> getPostsCount(){
         Long count = postService.getPostsCount();
         return Result.success(count);
+    }
+
+
+    @GetMapping("/scroll")
+    public Result<ScrollPageVO<PostDTO>> getScrollPosts(@RequestParam Long max, @RequestParam Integer offset){
+        return Result.success(postService.getScrollPosts(max, offset));
     }
 }

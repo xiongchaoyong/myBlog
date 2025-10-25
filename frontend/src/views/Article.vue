@@ -274,7 +274,6 @@ import { Delete } from '@element-plus/icons-vue'
 import { Edit } from '@element-plus/icons-vue'
 import SiderBar from '@/components/SiderBar.vue'
 import { useCategoryStore } from '@/stores/categoryStore'
-import { useArticleStore } from '@/stores/articleStore'
 import { getArticleById, incrementViewCount, likeArticle, deleteArticle, type Article } from '@/api/article'
 import { formatFullDate } from '@/utils/dateUtils'
 import { MdPreview } from 'md-editor-v3'
@@ -311,7 +310,6 @@ const loading = ref(false)
 // 分类数据
 const categories = ref<any[]>([]) // Changed to any[] as Category type is removed
 const categoryStore = useCategoryStore()
-const articleStore = useArticleStore()
 
 /**
  * MdPreview组件引用
@@ -399,9 +397,6 @@ const isReadingMode = ref(false)
  */
 const showToolMenu = ref(false)
 
-/**
- * 根据路由参数获取文章数据（优先本地缓存）
- */
 const getArticleData = async () => {
   const articleId = parseInt(route.params.id as string)
   console.log(articleId)
@@ -411,12 +406,8 @@ const getArticleData = async () => {
   }
   try {
     loading.value = true
-    articleStore.incrementViewCount(articleId)
-    articleData.value = articleStore.getArticleById(articleId)
-
-    if (articleData.value===undefined) {
-      articleData.value= await getArticleById(articleId)
-    }
+     articleData.value= await getArticleById(articleId)
+    
     // 等待DOM更新后生成目录
     await nextTick()
     generateToc()
@@ -553,8 +544,6 @@ const handleDeleteArticle = async () => {
     const articleId = articleData.value?.id
     await deleteArticle(articleId)
     ElMessage.success('文章删除成功')
-    // 从缓存中移除已删除的文章
-    await articleStore.deleteArticle(articleId, articleData.value?.categoryId)
     // 跳转到分类页面
     router.push('/')
   } catch (error) {
