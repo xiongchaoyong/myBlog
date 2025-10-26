@@ -1,19 +1,22 @@
 package com.x.service.impl;
 
+import cn.hutool.json.JSONUtil;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
+import com.x.common.constant.RedisKeyConstants;
 import com.x.mapper.CategoryMapper;
 import com.x.pojo.dto.CategoryForm;
 import com.x.pojo.entity.Category;
 import com.x.service.CategoryService;
+import com.x.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-/**
- * 分类服务实现类
- */
 @Service
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
@@ -21,9 +24,21 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @Override
     public List<Category> getAllCategories() {
-        return categoryMapper.selectAll();
+        String key= RedisKeyConstants.CATEGORY_INFO;
+        String  res=stringRedisTemplate.opsForValue().get(key);
+        if(StrUtil.isNotBlank( res)){
+            return JSONUtil.toList(res,Category.class);
+        }
+
+        List< Category>  categories=categoryMapper.selectAll();
+        stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonStr(categories));
+        System.out.println("从数据库中获取分类信息");
+        return categories;
     }
 
     @Override
@@ -47,6 +62,22 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getAllCategoriesWithCount() {
-        return categoryMapper.selectAllWithArticleCount();
+//        String key= RedisKeyConstants.CATEGORY_INFO;
+//        String  res=stringRedisTemplate.opsForValue().get(key);
+//        if(StrUtil.isNotBlank( res)){
+//            return JSONUtil.toList(res,Category.class);
+//        }
+//
+//        List< Category>  categories=categoryMapper.selectAllWithArticleCount();
+//        stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonStr(categories));
+//        System.out.println("从数据库中获取分类信息");
+//        return categories;
+        return  null;
+    }
+
+    @Override
+    public Long getCategoryCount() {
+        String key= RedisKeyConstants.CATEGORY_COUNT;
+        return RedisUtil.getCount(key,RedisKeyConstants.COUNT_TTL, TimeUnit.HOURS, categoryMapper::getCount,stringRedisTemplate);
     }
 }

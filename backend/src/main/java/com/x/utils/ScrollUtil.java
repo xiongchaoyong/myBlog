@@ -1,13 +1,13 @@
 package com.x.utils;
 
 import com.x.exception.BaseException;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
 import java.util.*;
 
 public class ScrollUtil {
-    public static Map<String, Object> ScllorGetIds(String key, Integer min, Long max, Integer offset, int count, RedisTemplate redisTemplate){
+    public static Map<String, Object> ScllorGetIds(String key, Integer min, Long max, Integer offset, int count, StringRedisTemplate redisTemplate){
         //从redis中查询缓存数据  id :  timestamp
         Set<ZSetOperations.TypedTuple<String>> typedTuples = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(
                 key, min, max, offset, count);

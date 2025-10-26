@@ -6,11 +6,25 @@ public class RedisKeyConstants {
     public static final String LOCK_PREFIX = "lock:";
     public static final String STORE_PREFIX = "store:";
 
+    public  static  final  String INFO =  "info:";
+
     // 具体业务锁
     public static final String LOCK_REGISTER = LOCK_PREFIX + "register";
 
     public static final String STORE_ARTICLEIDS = STORE_PREFIX+"articleIds";
 
     public static final String STORE_POSTIDS = STORE_PREFIX+"postIds";
+
+    public  static  final  String POST_COUNT="postCount";
+    public static final String USER_COUNT="userCount";
+    public static final String ARTICLE_COUNT="articleCount";
+
+    public static final String CATEGORY_COUNT="categoryCount";
+
+    public static final String MY_POST_COUNT="myPostCount";
+
+    public static final String CATEGORY_INFO=INFO+"category";
+
+    public static final int COUNT_TTL=3;
 
 }

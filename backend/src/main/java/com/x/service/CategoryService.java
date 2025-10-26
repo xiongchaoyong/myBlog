@@ -28,4 +28,6 @@ public interface CategoryService {
      */
     List<Category> getAllCategoriesWithCount();
 
+    Long getCategoryCount();
+
 }

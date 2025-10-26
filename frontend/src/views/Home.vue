@@ -1,6 +1,6 @@
 <template>
   <div class="allall">
-          <SiderBar />
+    <SiderBar />
 
     <Layout />
     <div class="all">
@@ -8,129 +8,99 @@
       <!-- 文章列表区域 -->
       <div class="article-list" ref="articleListRef">
         <div class="articles-container">
-            <!-- 有数据 -->
-            <template v-if="!isLoading && articles?.length > 0">
-              <div
-                v-for="(article, index) in articles"
-                :key="article?.id"
-                class="article-item"
-                :class="{ 'article-reverse': (index + 1) % 2 === 0 }"
-                @click="handleArticleClick(article)"
-              >
-                <div class="article-cover">
-                  <img :src="article?.cover" :alt="article?.title" />
-                </div>
-                <div class="article-content">
-                  <h3 class="article-title">{{ article?.title }}</h3>
-                  <p class="article-desc">{{ article?.summary }}</p>
-                  <div class="article-meta">
-                    <div class="meta-row">
-                      <span class="view-count">
-                        <svg style="width: 1rem; height: 1rem">
-                          <use xlink:href="#icon-chakan" fill="#1296db"></use>
-                        </svg>
-                        {{ article?.viewCount }} 观看
-                      </span>
-                      <span class="like-count">
-                        <svg style="width: 1rem; height: 1rem">
-                          <use xlink:href="#icon-icon" fill="#1296db"></use>
-                        </svg>
-                        {{ article?.likeCount }} 点赞
-                      </span>
-                      <span class="comment-count">
-                        <svg style="width: 1rem; height: 1rem">
-                          <use xlink:href="#icon-pinglun" fill="#1296db"></use>
-                        </svg>
-                        {{ article?.commentCount }} 评论
-                      </span>
-                    </div>
-                    <div class="category-container">
-                      <span
-                        v-if="getCategoryName(article?.categoryId)"
-                        class="category-tag"
-                        :style="getCategoryStyle(article?.categoryId)"
-                      >
-                        {{ getCategoryName(article?.categoryId) }}
-                      </span>
-                    </div>
-                    <div class="time-row">
-                      <span class="publish-time"
-                        >发布时间：{{
-                          formatFullDate(article?.publishTime)
-                        }}</span
-                      >
-                      <span class="update-time"
-                        >更新时间：{{
-                          formatFullDate(article?.updateTime)
-                        }}</span
-                      >
-                    </div>
+          <!-- 有数据 -->
+          <template v-if="!isLoading && articles?.length > 0">
+            <div v-for="(article, index) in articles" :key="article?.id" class="article-item"
+              :class="{ 'article-reverse': (index + 1) % 2 === 0 }" @click="handleArticleClick(article)">
+              <div class="article-cover">
+                <img :src="article?.cover" :alt="article?.title" />
+              </div>
+              <div class="article-content">
+                <h3 class="article-title">{{ article?.title }}</h3>
+                <p class="article-desc">{{ article?.summary }}</p>
+                <div class="article-meta">
+                  <div class="meta-row">
+                    <span class="view-count">
+                      <svg style="width: 1rem; height: 1rem">
+                        <use xlink:href="#icon-chakan" fill="#1296db"></use>
+                      </svg>
+                      {{ article?.viewCount }} 观看
+                    </span>
+                    <span class="like-count">
+                      <svg style="width: 1rem; height: 1rem">
+                        <use xlink:href="#icon-icon" fill="#1296db"></use>
+                      </svg>
+                      {{ article?.likeCount }} 点赞
+                    </span>
+                    <span class="comment-count">
+                      <svg style="width: 1rem; height: 1rem">
+                        <use xlink:href="#icon-pinglun" fill="#1296db"></use>
+                      </svg>
+                      {{ article?.commentCount }} 评论
+                    </span>
+                  </div>
+                  <div class="category-container">
+                    <span v-if="getCategoryName(article?.categoryId)" class="category-tag"
+                      :style="getCategoryStyle(article?.categoryId)">
+                      {{ getCategoryName(article?.categoryId) }}
+                    </span>
+                  </div>
+                  <div class="time-row">
+                    <span class="publish-time">发布时间：{{
+                      formatFullDate(article?.publishTime)
+                      }}</span>
+                    <span class="update-time">更新时间：{{
+                      formatFullDate(article?.updateTime)
+                      }}</span>
                   </div>
                 </div>
               </div>
-            </template>
+            </div>
+          </template>
 
-            <!-- 骨架屏 -->
-            <template v-else-if="isLoading">
-              <div
-                v-for="i in skeletonCount"
-                :key="i"
-                class="article-item"
-                :class="{ 'article-reverse': i % 2 === 0 }"
-              >
-                <div class="article-cover skeleton-cover">
-                  <el-skeleton-item
-                    variant="image"
-                    style="width: 100%; height: 100%"
-                  />
-                </div>
-                <div class="article-content">
-                  <el-skeleton style="width: 100%">
-                    <template #template>
-                      <el-skeleton-item
-                        variant="h3"
-                        style="width: 80%; margin-bottom: 16px"
-                      />
-                      <div class="meta-row">
-                        <el-skeleton-item
-                          variant="text"
-                          style="width: 30%; margin-right: 10px"
-                        />
-                        <el-skeleton-item
-                          variant="text"
-                          style="width: 30%; margin-right: 10px"
-                        />
-                        <el-skeleton-item variant="text" style="width: 30%" />
-                      </div>
-                      <div style="margin-top: 8px">
-                        <el-skeleton-item variant="text" style="width: 20%" />
-                      </div>
-                      <div class="meta-row time-row" style="margin-top: 8px">
-                        <el-skeleton-item
-                          variant="text"
-                          style="width: 45%; margin-right: 10px"
-                        />
-                        <el-skeleton-item variant="text" style="width: 45%" />
-                      </div>
-                    </template>
-                  </el-skeleton>
-                </div>
+          <!-- 骨架屏 -->
+          <template v-else-if="isLoading">
+            <div v-for="i in skeletonCount" :key="i" class="article-item" :class="{ 'article-reverse': i % 2 === 0 }">
+              <div class="article-cover skeleton-cover">
+                <el-skeleton-item variant="image" style="width: 100%; height: 100%" />
               </div>
-            </template>
+              <div class="article-content">
+                <el-skeleton style="width: 100%">
+                  <template #template>
+                    <el-skeleton-item variant="h3" style="width: 80%; margin-bottom: 16px" />
+                    <div class="meta-row">
+                      <el-skeleton-item variant="text" style="width: 30%; margin-right: 10px" />
+                      <el-skeleton-item variant="text" style="width: 30%; margin-right: 10px" />
+                      <el-skeleton-item variant="text" style="width: 30%" />
+                    </div>
+                    <div style="margin-top: 8px">
+                      <el-skeleton-item variant="text" style="width: 20%" />
+                    </div>
+                    <div class="meta-row time-row" style="margin-top: 8px">
+                      <el-skeleton-item variant="text" style="width: 45%; margin-right: 10px" />
+                      <el-skeleton-item variant="text" style="width: 45%" />
+                    </div>
+                  </template>
+                </el-skeleton>
+              </div>
+            </div>
+          </template>
 
-            <!-- 无数据提示 -->
-            <div v-else class="no-data">
-              <el-empty description="暂无文章" />
-            </div>
-            <!-- 加载状态 -->
-            <div v-if="isLoadingMore" class="loading-more">
-              <el-icon class="loading-icon"><Loading /></el-icon>
-              <span>加载中...</span>
-            </div>
-            <div v-else-if="!hasMore" class="no-more">
-              已经到底啦 ~
-            </div>
+          <!-- 无数据提示 -->
+          <div v-else class="no-data">
+            <el-empty description="暂无文章" />
           </div>
+          <!-- 加载状态 -->
+          <div v-if="isLoadingMore" class="loading-more">
+            <el-icon class="loading-icon">
+              <Loading />
+            </el-icon>
+            <span>加载中...</span>
+          </div>
+          <div v-else-if="!hasMore" class="no-more">
+            已经到底啦 ~
+          </div>
+        </div>
 
       </div>
 
@@ -152,11 +122,11 @@
           <div class="stats">
             <div>
               <span>文章</span>
-              <strong>{{ myArticleCount}}</strong>
+              <strong>{{ articlescount}}</strong>
             </div>
             <div>
               <span>分类</span>
-              <strong>{{ categories.length }}</strong>
+              <strong>{{ categoryCount }}</strong>
             </div>
             <div>
               <span>动态</span>
@@ -170,22 +140,14 @@
               <svg style="width: 1.3rem; height: 1.3rem">
                 <use xlink:href="#icon-QQ" fill="#1296db"></use>
               </svg>
-              <img
-                class="hover-img"
-                src="../assets/qq二维码.jpg"
-                alt="QQ二维码"
-              />
+              <img class="hover-img" src="../assets/qq二维码.jpg" alt="QQ二维码" />
             </span>
 
             <span class="icon icon-container" title="微信">
               <svg style="width: 1.3rem; height: 1.3rem">
                 <use xlink:href="#icon-weixin" fill="#1aad19"></use>
               </svg>
-              <img
-                class="hover-img"
-                src="../assets/微信二维码.jpg"
-                alt="微信二维码"
-              />
+              <img class="hover-img" src="../assets/微信二维码.jpg" alt="微信二维码" />
             </span>
 
             <span class="icon" title="Gitee">
@@ -206,10 +168,7 @@
               </svg>
             </span>
 
-            <a
-              href="https://space.bilibili.com/2062571671?spm_id_from=333.1007.0.0"
-              target="_blank"
-            >
+            <a href="https://space.bilibili.com/2062571671?spm_id_from=333.1007.0.0" target="_blank">
               <span class="icon" title="B站">
                 <svg style="width: 1.3rem; height: 1.3rem">
                   <use xlink:href="#icon-Bzhan" fill="#00a1d6"></use>
@@ -222,19 +181,6 @@
           <CategroyWord></CategroyWord>
         </div>
 
-        <!-- <el-carousel   :interval="3000" height="260px" motion-blur arrow="never">
-          <el-carousel-item v-for="(item, index) in slides" :key="index">
-            <div class="card-content">
-              <img v-if="item?.imageUrls?.length===0" class="card-image" src="../assets/默认封面.png" alt="">
-              <img v-else
-                :src="item?.imageUrls[0]"
-                class="card-image"
-              />
-              <span class="time">{{ item?.createdAt }}</span>
-              <p class="text">{{ item?.content }}</p>
-            </div>
-          </el-carousel-item>
-        </el-carousel> -->
 
         <div class="info-card">
           <div class="card-header">
@@ -247,7 +193,7 @@
             </div>
             <div class="info-item">
               <span>文章数目：</span>
-              <strong>{{ myArticleCount }}</strong>
+              <strong>{{ articlescount }}</strong>
             </div>
             <div class="info-item">
               <span>动态数目：</span>
@@ -266,16 +212,14 @@
       </div>
     </div>
   </div>
-      <waves></waves>
+  <waves></waves>
 
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import { useArticleStore } from "@/stores/articleStore";
-import { useCategoryStore } from "@/stores/categoryStore";
 import { type Article, type ScrollPageVO } from "@/api/article";
 import { type Category } from "@/api/category";
 import { formatFullDate } from "@/utils/dateUtils";
@@ -284,17 +228,15 @@ import { Loading } from '@element-plus/icons-vue';
 import SiderBar from "@/components/SiderBar.vue";
 import Layout from "./Layout.vue";
 import CategroyWord from "@/components/CategoryWord.vue";
-import type { Moment } from "@/api/Post";
 import Post from "@/api/Post";
 import {getMyArticleCount} from "@/api/article";
 import waves from "@/components/waves.vue";
 import { getScrollArticles } from "@/api/article";
+import { getCategoryCount } from "@/api/category";
 
 
 const categories = ref<Category[]>([]);
 const router = useRouter();
-const articleStore = useArticleStore();
-const categoryStore = useCategoryStore();
 
 //优化分页组件显示
 const isLoading = ref(true);
@@ -418,39 +360,30 @@ const handleArticleClick = (article: Article) => {
 
 
 
-const slides = ref<Moment[]>([]);
 const postCount = ref(0);
 const myPostCount = ref(0);
 const allUserCount = ref(0);
-const myArticleCount = ref(0);
+const articlescount = ref(0);
+const categoryCount=ref(0);
 import User from "@/api/User";
-import { usePostStore } from "@/stores/postStroe";
-const postStore = usePostStore();
-//动态初始化
-//获取前五条
-//获取动态总数量、个人的数量
-//获取注册人数
-//我的文章数目
+
 onMounted(async () => {
-  // if(postStore.getMonentList?.length > 0){
-  //   for(let i=0; i<5;i++){
-  //     slides.value.push(postStore.getMonentList[i]);
-  //   }
-  // }else{
-  //   const postRes = await Post.getFivePosts();
-  //   slides.value = postRes.data.data;
-  // }
+  //总的动态数目
   const postCountRes = await Post.getPostsCount();
     postCount.value = postCountRes.data.data;
-
+  //我的动态数目
   const myPostCountRes = await Post.getMyPostsCount();
     myPostCount.value = myPostCountRes.data.data;
-
+  //注册人数
   const allUserCountRes = await User.getUserCount();
     allUserCount.value = allUserCountRes.data.data;
+  //文章数目
+  const articleCountRes = await getMyArticleCount();
+  articlescount.value = articleCountRes.data.data;
 
-  const myArticleCountRes = await getMyArticleCount();
-  myArticleCount.value = myArticleCountRes.data.data;
+  //获得分类数目
+  const categoryCountRes = await getCategoryCount();
+  categoryCount.value = categoryCountRes.data.data;
 });
 
 
@@ -485,6 +418,7 @@ function getRunningDays(startDate: string): number {
   display: flex;
   flex-direction: column;
 }
+
 .all {
   display: flex;
   min-height: 100vh;
@@ -522,7 +456,8 @@ function getRunningDays(startDate: string): number {
 }
 
 .article-cover {
-  flex: 3; /* 图片缩小 */
+  flex: 3;
+  /* 图片缩小 */
   height: 230px;
   overflow: hidden;
 }
@@ -602,7 +537,8 @@ function getRunningDays(startDate: string): number {
   font-size: 0.85rem;
   color: #999;
   display: flex;
-  gap: 20px; /* 两个时间横排 */
+  gap: 20px;
+  /* 两个时间横排 */
   margin-top: 6px;
 }
 
@@ -767,13 +703,16 @@ function getRunningDays(startDate: string): number {
   height: 180px;
   object-fit: cover;
 }
+
 /* 深度选择器覆盖 Element Plus 指示器样式 */
 ::v-deep(.el-carousel__indicators li button) {
-  background-color: #e684e6; /* 未激活颜色 */
+  background-color: #e684e6;
+  /* 未激活颜色 */
 }
 
 ::v-deep(.el-carousel__indicators li.is-active button) {
-  background-color: #ef2def; /* 激活颜色 */
+  background-color: #ef2def;
+  /* 激活颜色 */
 }
 
 .time {
@@ -793,12 +732,16 @@ function getRunningDays(startDate: string): number {
   color: #222;
   font-weight: bold;
 
-  white-space: nowrap; /* 不换行 */
-  overflow: hidden; /* 超出隐藏 */
-  text-overflow: ellipsis; /* 超出显示省略号 */
+  white-space: nowrap;
+  /* 不换行 */
+  overflow: hidden;
+  /* 超出隐藏 */
+  text-overflow: ellipsis;
+  /* 超出显示省略号 */
 }
 
-.loading-more, .no-more {
+.loading-more,
+.no-more {
   text-align: center;
   padding: 20px 0;
   color: #666;
@@ -817,7 +760,12 @@ function getRunningDays(startDate: string): number {
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

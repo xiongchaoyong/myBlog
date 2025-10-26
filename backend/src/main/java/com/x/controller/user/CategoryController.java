@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 分类控制器
- */
 @RestController
 @RequestMapping("/user/categories")
 @Slf4j
@@ -22,11 +19,6 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
-
-    /**
-     * 获取分类列表
-     * @return Result<List<Category>>
-     */
     @GetMapping
     public Result<List<Category>> getCategories() {
         try {
@@ -37,12 +29,6 @@ public class CategoryController {
             return Result.error("获取分类列表失败");
         }
     }
-
-    /**
-     * 创建分类
-     * @param categoryForm 分类表单
-     * @return Result<Category>
-     */
     @PostMapping("/create")
     public Result<Category> createCategory(@RequestBody CategoryForm categoryForm) {
         AuthJudjeUtil.isAdmin();
@@ -55,10 +41,6 @@ public class CategoryController {
         }
     }
 
-    /**
-     * 获取分类列表及其文章数量
-     * @return Result<List<Category>>
-     */
     @GetMapping("/with-count")
     public Result<List<Category>> getCategoriesWithCount() {
         try {
@@ -67,6 +49,17 @@ public class CategoryController {
         } catch (Exception e) {
             log.error("获取分类列表失败", e);
             return Result.error("获取分类列表失败");
+        }
+    }
+
+    @GetMapping("/getCategoryCount")
+    public Result<Long> getCategoryCount() {
+        try {
+            Long count = categoryService.getCategoryCount();
+            return Result.success(count);
+        } catch (Exception e) {
+            log.error("获取分类数量失败", e);
+            return Result.error("获取分类数量失败");
         }
     }
 }

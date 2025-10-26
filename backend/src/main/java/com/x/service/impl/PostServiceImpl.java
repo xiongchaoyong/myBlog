@@ -12,13 +12,15 @@ import com.x.pojo.dto.PostLikeDTO;
 import com.x.pojo.dto.SendPostDTO;
 import com.x.pojo.vo.ScrollPageVO;
 import com.x.service.PostService;
+import com.x.utils.RedisUtil;
 import com.x.utils.ScrollUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -32,7 +34,7 @@ public class PostServiceImpl implements PostService {
     private PostCommentMapper postCommentMapper;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public List<PostDTO> getPosts() {
@@ -56,7 +58,7 @@ public class PostServiceImpl implements PostService {
     public Long sendPost(SendPostDTO sendPostDTO) {
         postMapper.sendPost(sendPostDTO);
         //添加到redis
-        redisTemplate.opsForZSet().add(RedisKeyConstants.STORE_POSTIDS,String.valueOf(sendPostDTO.getId()),System.currentTimeMillis());
+        stringRedisTemplate.opsForZSet().add(RedisKeyConstants.STORE_POSTIDS,String.valueOf(sendPostDTO.getId()),System.currentTimeMillis());
         return sendPostDTO.getId();
     }
 
@@ -86,17 +88,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Long getMyPostsCount() {
-        return postMapper.getMyPostsCount();
+        return RedisUtil.getCount(RedisKeyConstants.MY_POST_COUNT,
+                RedisKeyConstants.COUNT_TTL, TimeUnit.HOURS, postMapper::getMyPostsCount,stringRedisTemplate);
     }
 
     @Override
     public Long getPostsCount() {
-        return postMapper.getPostsCount();
-    }
+        return RedisUtil.getCount(RedisKeyConstants.POST_COUNT,
+                RedisKeyConstants.COUNT_TTL, TimeUnit.HOURS, postMapper::getPostsCount,stringRedisTemplate);    }
 
     @Override
     public ScrollPageVO<PostDTO> getScrollPosts(Long max, Integer offset) {
-        Map<String, Object> map = ScrollUtil.ScllorGetIds(RedisKeyConstants.STORE_POSTIDS, 0, max, offset, 5,redisTemplate);
+        Map<String, Object> map = ScrollUtil.ScllorGetIds(RedisKeyConstants.STORE_POSTIDS, 0, max, offset, 5,stringRedisTemplate);
         Long minTime = (Long) map.get("minTime");
         Integer os = (Integer) map.get("os");
         System.out.println(map.get("ids"));

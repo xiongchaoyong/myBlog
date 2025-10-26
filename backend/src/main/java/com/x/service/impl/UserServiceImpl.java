@@ -20,11 +20,13 @@ import com.x.pojo.vo.UserSearchVO;
 import com.x.properties.GithubProperties;
 import com.x.service.UserService;
 import com.x.utils.GithubLogin;
+import com.x.utils.RedisUtil;
 import com.x.utils.ValidatorUtil;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -54,6 +56,9 @@ public class UserServiceImpl implements UserService {
     private RedissonClient redissonClient;
     @Autowired
     private GithubProperties githubProperties;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
     @Override
     public UserInfo login(UserLoginDTO userLoginDTO)  {
         User user;
@@ -126,8 +131,6 @@ public class UserServiceImpl implements UserService {
     public User getById(Long id) {
         return userMapper.getById(id);
     }
-
-
     @Override
     public void update(UserUpdateDTO userUpdateDTO) {
         //判断原密码是否正确
@@ -146,7 +149,6 @@ public class UserServiceImpl implements UserService {
         user1.setId(BaseContext.getCurUserInfo().getId());
         userMapper.update(user1);
     }
-
     @Override
     public UserSearchVO searchByAccount(String account) {
         User user=userMapper.getByAccount(account);
@@ -209,7 +211,19 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public Long getUserCount() {
-        return userMapper.getUserCount();
+//        //先看缓存中是否有
+//        String key=RedisKeyConstants.USER_COUNT;
+//        String count = stringRedisTemplate.opsForValue().get(key);
+//        //存在
+//        if(StrUtil.isNotBlank(count)){  //  null / "" /"  "
+//            return Long.parseLong(count);
+//        }
+//        //查询数据库
+//        Long countRes = userMapper.getUserCount();
+//        stringRedisTemplate.opsForValue().set(key,countRes.toString(), RedisKeyConstants.COUNT_TTL, TimeUnit.HOURS);
+//        return countRes;
+        return RedisUtil.getCount(RedisKeyConstants.USER_COUNT,
+                RedisKeyConstants.COUNT_TTL, TimeUnit.HOURS, userMapper::getUserCount,stringRedisTemplate);
     }
 
     @Override

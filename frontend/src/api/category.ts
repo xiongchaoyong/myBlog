@@ -70,3 +70,10 @@ export const getCategoriesWithCount = async (): Promise<Category[]> => {
     throw error
   }
 }
+
+export const getCategoryCount=()=>{
+  return request({
+    url:'/user/categories/getCategoryCount',
+    method:'get'
+  })
+}

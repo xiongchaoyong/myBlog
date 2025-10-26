@@ -9,16 +9,18 @@ import com.x.pojo.dto.ArticleUpdateDTO;
 import com.x.pojo.entity.Article;
 import com.x.pojo.vo.ScrollPageVO;
 import com.x.service.ArticleService;
+import com.x.utils.RedisUtil;
 import com.x.utils.ScrollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 文章服务实现类
@@ -36,7 +38,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
 
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -64,7 +66,7 @@ public class ArticleServiceImpl implements ArticleService {
         // 保存文章
         articleMapper.insert(article);
         //保存到redis
-        redisTemplate.opsForZSet().add(RedisKeyConstants.STORE_ARTICLEIDS, String.valueOf(article.getId()),System
+        stringRedisTemplate.opsForZSet().add(RedisKeyConstants.STORE_ARTICLEIDS, String.valueOf(article.getId()),System
                 .currentTimeMillis());
         return article;
     }
@@ -83,8 +85,9 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public int getArticleCount(Long categoryId) {
-        return articleMapper.selectArticleCount(categoryId);
+    public Long getArticleCount(Long categoryId) {
+        return RedisUtil.getCount(RedisKeyConstants.STORE_ARTICLEIDS,
+                RedisKeyConstants.COUNT_TTL, TimeUnit.DAYS,articleMapper::getMyArticleCount,stringRedisTemplate);
     }
 
 
@@ -198,12 +201,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Long getMyArticleCount() {
-        return articleMapper.getMyArticleCount();
-    }
+        return RedisUtil.getCount(RedisKeyConstants.ARTICLE_COUNT,
+                RedisKeyConstants.COUNT_TTL, TimeUnit.HOURS,articleMapper::getMyArticleCount,stringRedisTemplate);    }
 
     @Override
     public ScrollPageVO<Article> getScrollArticles(Long max, Integer offset) {
-        Map<String, Object> map = ScrollUtil.ScllorGetIds(RedisKeyConstants.STORE_ARTICLEIDS, 0, max, offset, 5,redisTemplate);
+        Map<String, Object> map = ScrollUtil.ScllorGetIds(RedisKeyConstants.STORE_ARTICLEIDS, 0, max, offset, 5,stringRedisTemplate);
         Long minTime = (Long) map.get("minTime");
         Integer os = (Integer) map.get("os");
         List<Integer> ids = (List<Integer>) map.get("ids");

@@ -36,7 +36,7 @@ public interface ArticleService {
      * @param categoryId 分类ID（可选）
      * @return 文章总数
      */
-    int getArticleCount(Long categoryId);
+    Long getArticleCount(Long categoryId);
 
     /**
      * 根据ID获取文章详情

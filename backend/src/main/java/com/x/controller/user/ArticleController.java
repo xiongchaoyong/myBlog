@@ -80,7 +80,7 @@ public class ArticleController {
             @RequestParam(required = false) Long categoryId) {
         try {
             List<Article> articles = articleService.getArticles(page, size, categoryId);
-            int total = articleService.getArticleCount(categoryId);
+            Long total = articleService.getArticleCount(categoryId);
 
             Map<String, Object> result = new HashMap<>();
             result.put("articles", articles);

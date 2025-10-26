@@ -96,7 +96,7 @@ public interface ArticleMapper {
 
     List<Long> getIds(Integer categoryId);
 
-    @Select("select count(*) from article where user_id = 12")
+    @Select("select count(*) from article ")
     Long getMyArticleCount();
 
     List<Article> getArticlesByIds(List<Integer> ids);

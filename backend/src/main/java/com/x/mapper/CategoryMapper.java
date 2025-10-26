@@ -2,6 +2,7 @@ package com.x.mapper;
 
 import com.x.pojo.entity.Category;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -35,4 +36,7 @@ public interface CategoryMapper {
      * @return 分类列表
      */
     List<Category> selectAllWithArticleCount();
+
+    @Select("select count(*) from category")
+    Long getCount();
 }
