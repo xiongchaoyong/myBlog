@@ -197,7 +197,7 @@ import Loading from '@/components/Loading.vue'
 import { formatLocalDate, formatShortDate } from '@/utils/dateUtils'
 import { marked } from 'marked'
 import { useArticleStore } from '@/stores/articleStore'
-import { useCategoryStore } from '@/stores/categoryStore'
+// import { useCategoryStore } from '@/stores/categoryStore'
 import HeaderWave from '@/components/HeaderWave.vue'
 import { Emoji } from '@vavt/v3-extension';
 import '@vavt/v3-extension/lib/asset/Emoji.css';
@@ -245,7 +245,7 @@ const newCategoryForm = reactive({
 
 // 状态管理
 const articleStore = useArticleStore()
-const categoryStore = useCategoryStore()
+// const categoryStore = useCategoryStore()
 
 // 本地加载状态
 const isPublishing = ref(false)
@@ -271,7 +271,7 @@ const isLoadingCategories = ref(false)
 const loadCategories = async () => {
   try {
     isLoadingCategories.value = true
-    categories.value = await categoryStore.fetchCategories()
+    // categories.value = await categoryStore.fetchCategories()
   } catch (error) {
     console.error('获取分类列表失败:', error)
     categories.value = []
@@ -310,10 +310,10 @@ const handleCreateCategory = async () => {
     })
 
     // 强制刷新分类store缓存
-    await Promise.all([
-      categoryStore.refreshCategories(),
-      categoryStore.refreshCategoriesWithCount()
-    ])
+    // await Promise.all([
+    //   categoryStore.refreshCategories(),
+    //   categoryStore.refreshCategoriesWithCount()
+    // ])
 
     // 自动选择新创建的分类
     articleForm.categoryId = newCategory.id
@@ -386,24 +386,24 @@ const loadDraftToEditor = (draft: Draft) => {
  * 根据路由参数id加载文章详情（编辑模式）
  * @returns {Promise<void>}
  */
-const loadArticleDetail = async () => {
-  const id = route.params.id
-  if (!id) return
-  try {
-    isPublishing.value = true
-    const detail =  articleStore.getArticleById(Number(id))
-    articleForm.title = detail.title
-    articleForm.cover = detail.cover
-    articleForm.categoryId = detail.categoryId
-    articleForm.summary = detail.summary
-    articleForm.content = detail.content
-  } catch (e) {
-    console.error('加载文章详情失败:', e)
-    ElMessage.error('加载文章详情失败')
-  } finally {
-    isPublishing.value = false
-  }
-}
+// const loadArticleDetail = async () => {
+//   const id = route.params.id
+//   if (!id) return
+//   try {
+//     isPublishing.value = true
+//     // const detail =  articleStore.getArticleById(Number(id))
+//     articleForm.title = detail.title
+//     articleForm.cover = detail.cover
+//     articleForm.categoryId = detail.categoryId
+//     articleForm.summary = detail.summary
+//     articleForm.content = detail.content
+//   } catch (e) {
+//     console.error('加载文章详情失败:', e)
+//     ElMessage.error('加载文章详情失败')
+//   } finally {
+//     isPublishing.value = false
+//   }
+// }
 
 /**
  * 组件挂载时获取分类列表和草稿数量
@@ -412,7 +412,7 @@ onMounted(() => {
   loadCategories()
   getDraftCount()
   if (route.params.id) {
-    loadArticleDetail()
+    // loadArticleDetail()
   }
 })
 
@@ -594,7 +594,7 @@ const handlePublish = async () => {
         // 编辑模式，调用更新接口
         const articleId = Number(route.params.id)
         result = await updateArticle(articleId, articleData)
-        articleStore.updateArticle(result)
+        // articleStore.updateArticle(result)
         ElMessage.success('文章更新成功！')
       } else {
 
@@ -619,7 +619,7 @@ const handlePublish = async () => {
         // 新建模式
         result = await publishArticle(articleData)
         ElMessage.success('文章发表成功！')
-        articleStore.addArticle(result)
+        // articleStore.addArticle(result)
       }
       // 清空表单
       Object.assign(articleForm, {

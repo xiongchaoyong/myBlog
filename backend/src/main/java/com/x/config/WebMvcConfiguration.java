@@ -44,6 +44,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 //分类
                 .excludePathPatterns("/user/categories")
                 .excludePathPatterns("/user/categories/with-count")
+                .excludePathPatterns("/user/categories/getCategoryCount")
 
                 .excludePathPatterns("/user/post/getPosts")
                 .excludePathPatterns("/user/post/getFivePosts")

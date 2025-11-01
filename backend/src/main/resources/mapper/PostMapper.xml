@@ -96,8 +96,7 @@
         <result column="content" property="content"/>
         <result column="created_at" property="createdAt"/>
         <!-- JSON -> List<String> -->
-        <result column="image_urls" property="imageUrls"
-                typeHandler="com.x.utils.JsonStringListTypeHandler"/>
+        <result column="image_urls" property="imageUrls"/>
 
         <!-- 嵌套对象 author -->
         <association property="author" javaType="com.x.pojo.dto.UserSimpleDTO">

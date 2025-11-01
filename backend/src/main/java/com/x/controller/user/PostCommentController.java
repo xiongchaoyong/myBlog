@@ -14,7 +14,6 @@ public class PostCommentController {
     private PostCommentService postCommentService;
     @PostMapping("/addComment")
     public Result addComment(@RequestBody AddCommentDTO addCommentDTO) {
-        System.out.println(addCommentDTO);
         postCommentService.addComment(addCommentDTO);
         return Result.success();
     }

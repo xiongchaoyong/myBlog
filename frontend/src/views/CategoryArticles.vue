@@ -17,7 +17,7 @@
             :mask="true"
           ></Loading>
         </div>
-        <el-empty v-else-if="articles.length === 0" description="暂无文章" />
+        <!-- <el-empty v-else-if="articles.length === 0" description="暂无文章" /> -->
         <div v-else class="articles-grid">
           <div
             v-for="article in articles"
@@ -63,7 +63,7 @@
         </div>
       </div>
       <!-- 将分页按钮移到文章区域外部 -->
-      <div class="pagination-container">
+      <!-- <div class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
           :page-size="12"
@@ -73,7 +73,7 @@
           background
           hide-on-single-page
         />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -84,7 +84,6 @@ import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { View, Star, ChatDotRound } from "@element-plus/icons-vue";
 import { useArticleStore } from "@/stores/articleStore";
-import { useCategoryStore } from "@/stores/categoryStore";
 import { formatShortDate } from "@/utils/dateUtils";
 import type { Article } from "@/api/article";
 import SiderBar from "@/components/SiderBar.vue";
@@ -95,7 +94,8 @@ interface Category {
   color?: string;
 }
 const articleStore = useArticleStore();
-const categoryStore = useCategoryStore();
+
+const articles=ref<Article[]>([]);
 const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
@@ -103,55 +103,55 @@ const selectedCategoryId = ref<number>();
 const curCategory = ref();
 onMounted(async () => {
   // 从路由参数获取分类ID
-  const categoryId = Number(route.query.categoryId);
-  if (!isNaN(categoryId)) {
-    selectedCategoryId.value = categoryId;
-  }
-  if (categoryStore.getAllCategory.length === 0)
-    await categoryStore.fetchCategories();
-  curCategory.value = categoryStore.getCurCategory(
-    selectedCategoryId.value as number
-  );
-  isLoading.value = true;
-  await articleStore.fetchArticlesByCategoryId(
-    selectedCategoryId.value as number,
-    1
-  );
-  console.log(curCategory.value);
-  isLoading.value = false;
+  // const categoryId = Number(route.query.categoryId);
+  // if (!isNaN(categoryId)) {
+  //   selectedCategoryId.value = categoryId;
+  // }
+  // if (categoryStore.getAllCategory.length === 0)
+  //   await categoryStore.fetchCategories();
+  // curCategory.value = categoryStore.getCurCategory(
+  //   selectedCategoryId.value as number
+  // );
+  // isLoading.value = true;
+  // await articleStore.fetchArticlesByCategoryId(
+  //   selectedCategoryId.value as number,
+  //   1
+  // );
+  // console.log(curCategory.value);
+  // isLoading.value = false;
 });
 
-const pageInfo = computed(() =>
-  articleStore.getCategoryPageInfo(
-    selectedCategoryId.value as number,
-    currentPage.value
-  )
-);
+// const pageInfo = computed(() =>
+//   articleStore.getCategoryPageInfo(
+//     selectedCategoryId.value as number,
+//     currentPage.value
+//   )
+// );
 
-const articles = computed(() => {
-  return articleStore.getArticlesByCategoryId(
-    selectedCategoryId.value as number,
-    currentPage.value
-  );
-});
+// const articles = computed(() => {
+//   return articleStore.getArticlesByCategoryId(
+//     selectedCategoryId.value as number,
+//     currentPage.value
+//   );
+// });
 
-const currentPage = ref(1);
-// 切页回调
-async function handleCurrentChange(page: number) {
-  currentPage.value = page;
-  // 如果当前页还没拉取过，就请求
-  await articleStore.fetchArticlesByCategoryId(
-    selectedCategoryId.value as number,
-    page
-  );
-}
+// const currentPage = ref(1);
+// // 切页回调
+// async function handleCurrentChange(page: number) {
+//   currentPage.value = page;
+//   // 如果当前页还没拉取过，就请求
+//   await articleStore.fetchArticlesByCategoryId(
+//     selectedCategoryId.value as number,
+//     page
+//   );
+// }
 
 /**
  * 处理页面变化
  */
-const handlePageChange = (page: number) => {
-  currentPage.value = page;
-};
+// const handlePageChange = (page: number) => {
+//   currentPage.value = page;
+// };
 
 /**
  * 处理文章点击

@@ -37,7 +37,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         List< Category>  categories=categoryMapper.selectAll();
         stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonStr(categories));
-        System.out.println("从数据库中获取分类信息");
         return categories;
     }
 

@@ -1,17 +1,18 @@
-package com.x.pojo.dto;
+package com.x.pojo.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class AddLikeDTO implements Serializable {
-    private Long postId;
+public class LikeInfo implements Serializable {
     private Long userId;
+    private String avatar;
+
+    private String username;
 }
